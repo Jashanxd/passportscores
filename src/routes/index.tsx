@@ -20,11 +20,12 @@ import {
   REGIONS,
   REGION_LABELS,
   TOTAL_DESTINATIONS,
-  accessListFor,
   getPassport,
   type AccessKind,
+  type Passport,
   type Region,
 } from "@/data/passports";
+import { useAccessLists, useLivePassport } from "@/hooks/usePassportData";
 
 export const Route = createFileRoute("/")({
   validateSearch: z.object({ country: z.string().optional() }),
