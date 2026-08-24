@@ -74,24 +74,25 @@ export const getAccessRules = createServerFn({ method: "GET" })
     return out;
   });
 
-/** Freshness / provenance of the stored data. */
+/** Freshness / provenance of the stored data. Only non-sensitive fields leave the server. */
 export const getDataStatus = createServerFn({ method: "GET" }).handler(async (): Promise<DataStatus> => {
-  const supabase = publicSupabase();
+  const publicClient = publicSupabase();
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const [{ data: runs }, { count }] = await Promise.all([
-    supabase
+    supabaseAdmin
       .from("data_sync_runs")
-      .select("source, status, message, finished_at")
+      .select("status, finished_at")
       .in("status", ["success", "partial"])
       .order("started_at", { ascending: false })
       .limit(1),
-    supabase.from("visa_rules").select("nationality_iso", { count: "exact", head: true }),
+    publicClient.from("visa_rules").select("nationality_iso", { count: "exact", head: true }),
   ]);
   const run = runs?.[0] ?? null;
   return {
-    source: run?.source ?? null,
+    source: run ? "live visa-rule feed" : null,
     updatedAt: run?.finished_at ?? null,
     status: run?.status ?? null,
-    message: run?.message ?? null,
+    message: null,
     hasRealRules: (count ?? 0) > 0,
   };
 });
