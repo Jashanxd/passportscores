@@ -69,8 +69,8 @@ function ComparePage() {
   const { a, b } = Route.useSearch();
   const navigate = useNavigate({ from: "/compare" });
 
-  const left = getPassport(a ?? "SG");
-  const right = getPassport(b ?? "IN");
+  const left = useLivePassport(getPassport(a ?? "SG") ?? getPassport("SG")!);
+  const right = useLivePassport(getPassport(b ?? "IN") ?? getPassport("IN")!);
 
   const setSlot = (slot: "a" | "b", iso: string) =>
     navigate({ search: (prev) => ({ ...prev, [slot]: iso }) });
