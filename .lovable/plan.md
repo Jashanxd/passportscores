@@ -16,22 +16,28 @@ down), so the highest rank number is around 100 — not 199. Our table assigns a
 
 ## The fix
 
-1. **Source the real 2026 standings** for all 199 passports: rank (with ties), total
-   visa-free/visa-on-arrival destination count, and the previous-year rank for the
-   year-over-year badge. This is a research + data-entry pass over the published index.
+1. **Source the real 2026 standings** for all 199 passports: rank (with ties) and the
+   previous-year rank for the year-over-year badge. This is the only thing taken from the
+   published index.
 2. **Rewrite the rank columns** in `src/data/passports.ts` from that source: `rank`,
-   `prevRank`, `regionalRank` (recomputed from the corrected global ranks, ties preserved),
-   and the destination totals used by headline stats.
-3. **Rebuild the visa split** (visa-free / on arrival / eTA / required) so each passport's
-   four numbers sum to the published total, keeping the split proportional to the live
-   provider feed where we have real rules for that passport.
+   `prevRank`, and `regionalRank` (recomputed from the corrected global ranks, ties
+   preserved).
+3. **Every access number comes from the API feed**: visa-free, visa-on-arrival, eTA, visa
+   required, total destinations and the mobility score are all computed from the stored
+   live rules for that passport, so the headline stats, the access bar and the Travel
+   Access / divergence lists always show the same figures. The bundled estimate stays only
+   as a fallback for passports the feed has no rules for (currently Kosovo), flagged as
+   estimated in the UI.
 4. **Rebuild the rank history sparkline** from the real previous-year ranks instead of the
    current extrapolation, so the trajectory chart stops showing invented flat runs.
 5. **Handle ties in the UI**: rankings table and compare table need to read correctly when
    two passports share a rank (equal rank means neither side "wins" that row), and the
    rankings list should order tied passports alphabetically.
-6. **Verify** against a spot-check list (Singapore, Japan, the #3 tie, UK, US, UAE, China,
+6. **Update the wording** so notes say ranks follow the 2026 index while all counts come
+   from the live visa-rule feed (covering 199 countries, hence lower than index totals).
+7. **Verify** against a spot-check list (Singapore, Japan, the #3 tie, UK, US, UAE, China,
    India, Pakistan, Afghanistan) on the Explore, Rankings and Compare pages.
+
 
 ## Technical notes
 
