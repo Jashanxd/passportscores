@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ApiPublicSyncVisaDataRouteImport } from './routes/api/public/sync-visa-data'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +36,11 @@ const RankingsRoute = RankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncVisaDataRoute = ApiPublicSyncVisaDataRouteImport.update({
   id: '/api/public/sync-visa-data',
   path: '/api/public/sync-visa-data',
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/sync-visa-data': typeof ApiPublicSyncVisaDataRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/sync-visa-data': typeof ApiPublicSyncVisaDataRoute
 }
 export interface FileRoutesById {
@@ -61,20 +69,33 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/compare': typeof CompareRoute
   '/rankings': typeof RankingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/sync-visa-data': typeof ApiPublicSyncVisaDataRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/compare' | '/rankings' | '/api/public/sync-visa-data'
+    | '/'
+    | '/about'
+    | '/compare'
+    | '/rankings'
+    | '/sitemap.xml'
+    | '/api/public/sync-visa-data'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/compare' | '/rankings' | '/api/public/sync-visa-data'
+  to:
+    | '/'
+    | '/about'
+    | '/compare'
+    | '/rankings'
+    | '/sitemap.xml'
+    | '/api/public/sync-visa-data'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/compare'
     | '/rankings'
+    | '/sitemap.xml'
     | '/api/public/sync-visa-data'
   fileRoutesById: FileRoutesById
 }
@@ -83,6 +104,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CompareRoute: typeof CompareRoute
   RankingsRoute: typeof RankingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicSyncVisaDataRoute: typeof ApiPublicSyncVisaDataRoute
 }
 
@@ -116,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RankingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-visa-data': {
       id: '/api/public/sync-visa-data'
       path: '/api/public/sync-visa-data'
@@ -131,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   CompareRoute: CompareRoute,
   RankingsRoute: RankingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicSyncVisaDataRoute: ApiPublicSyncVisaDataRoute,
 }
 export const routeTree = rootRouteImport
