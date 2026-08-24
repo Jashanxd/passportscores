@@ -24,7 +24,6 @@ export function useLivePassport(base: Passport): Passport {
   return useMemo(() => {
     if (!live) return base;
     const totalAccess = live.visaFree + live.visaOnArrival + live.eta;
-    const prevRank = live.prevRank ?? base.prevRank;
     const history = live.history.length >= 3 ? live.history : base.history10;
     return {
       ...base,
@@ -39,7 +38,7 @@ export function useLivePassport(base: Passport): Passport {
       eta: live.eta,
       visaRequired: live.visaRequired,
       totalAccess,
-      mobility: live.mobility || base.mobility,
+      mobility: base.mobility,
       history10: history.length >= 10 ? history.slice(-10) : [...base.history10.slice(0, 10 - history.length), ...history],
     };
   }, [base, live]);
@@ -54,7 +53,6 @@ export function useLivePassports(): Passport[] {
       const live = index.get(base.iso);
       if (!live) return base;
       const totalAccess = live.visaFree + live.visaOnArrival + live.eta;
-      const prevRank = live.prevRank ?? base.prevRank;
       return {
         ...base,
         rank: base.rank,
@@ -66,7 +64,7 @@ export function useLivePassports(): Passport[] {
         eta: live.eta,
         visaRequired: live.visaRequired,
         totalAccess,
-        mobility: live.mobility || base.mobility,
+        mobility: base.mobility,
       };
     });
     return merged.sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
