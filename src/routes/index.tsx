@@ -32,13 +32,13 @@ export const Route = createFileRoute("/")({
   validateSearch: z.object({ country: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: `Passport Index ${DATA_YEAR} — Measure Your Travel Freedom` },
+      { title: `Passport Scores ${DATA_YEAR} — Measure Your Travel Freedom` },
       {
         name: "description",
         content:
           "Explore how powerful any passport is: visa-free access, global and regional rank, mobility score and year-over-year change across 227 destinations.",
       },
-      { property: "og:title", content: `Passport Index ${DATA_YEAR} — Measure Your Travel Freedom` },
+      { property: "og:title", content: `Passport Scores ${DATA_YEAR} — Measure Your Travel Freedom` },
       {
         property: "og:description",
         content:

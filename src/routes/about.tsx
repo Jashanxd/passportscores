@@ -9,9 +9,9 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "How the Passport Index scores mobility: access categories, ranking rules, regional standing and year-over-year movement.",
+          "How Passport Scores measures mobility: access categories, ranking rules, regional standing and year-over-year movement.",
       },
-      { property: "og:title", content: "Methodology — Passport Index" },
+      { property: "og:title", content: "Methodology — Passport Scores" },
       {
         property: "og:description",
         content: "Access categories, ranking rules and the limits of passport mobility data.",

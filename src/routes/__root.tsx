@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Passport Index — Global Travel Freedom" },
+      { title: "Passport Scores — Global Travel Freedom" },
       {
         name: "description",
         content:
@@ -131,7 +131,7 @@ function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <Link to="/" className="group flex items-baseline gap-2">
-          <span className="font-display text-xl tracking-tight">Passport Index</span>
+          <span className="font-display text-xl tracking-tight">Passport Scores</span>
           <span className="hidden text-[10px] tracking-[0.2em] text-muted-foreground uppercase sm:inline">
             {DATA_YEAR}
           </span>
@@ -159,9 +159,12 @@ function SiteFooter() {
     <footer className="mt-24 border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-10 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>
-          Passport Index — a {DATA_YEAR} study of global mobility across 227 destinations.
+          Passport Scores — a {DATA_YEAR} study of global mobility across 227 destinations.
         </p>
         <DataFreshness />
+      </div>
+      <div className="mx-auto max-w-6xl px-6 pb-8 text-[11px] tracking-wide text-muted-foreground">
+        Made by — Jashan Chaudhary
       </div>
     </footer>
   );
