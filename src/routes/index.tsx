@@ -287,10 +287,12 @@ function Explorer() {
 
           {estimated && (
             <p className="mt-5 text-xs text-muted-foreground">
-              Estimated distribution — live per-country rules appear here once the visa data provider
-              is connected.
+              Estimated distribution, scaled to the {GLOBAL_STATS.countries} indexed countries —
+              live per-country rules appear here once this passport is covered by the visa data
+              provider.
             </p>
           )}
+
 
           <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
             {destinations.map((d: Passport) => (
