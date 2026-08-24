@@ -61,12 +61,23 @@ function Explorer() {
 
   const [tab, setTab] = useState<AccessKind>("free");
   const [region, setRegion] = useState<Region | "all">("all");
+  const [years, setYears] = useState(5);
+  const [query, setQuery] = useState("");
+
+  const trajectory = useMemo(
+    () => passport.history10.slice(passport.history10.length - years),
+    [passport, years],
+  );
 
   const lists = useMemo(() => accessListFor(passport), [passport]);
-  const destinations = useMemo(
-    () => lists[tab].filter((d) => region === "all" || d.region === region),
-    [lists, tab, region],
-  );
+  const destinations = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return lists[tab].filter(
+      (d) =>
+        (region === "all" || d.region === region) &&
+        (q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q)),
+    );
+  }, [lists, tab, region, query]);
 
   return (
     <div>
