@@ -72,10 +72,13 @@ function AboutPage() {
         <section>
           <h2 className="text-3xl">Ranking rules</h2>
           <p className="mt-4 leading-relaxed text-muted-foreground">
-            Global rank is ordered by total destinations reachable without a prior visa — visa-free,
-            visa on arrival and electronic travel authorisation combined. Passports with identical
-            totals share a rank. Regional rank re-ranks the same score inside each region, which is
-            often the more useful number: it tells you how a passport compares with its neighbours.
+            Global rank is taken directly from the published 2026 passport index, which scores every
+            passport against all 227 destinations; passports on the same published score share a
+            rank. Regional rank re-ranks those same standings inside each region, which is often the
+            more useful number: it tells you how a passport compares with its neighbours. Rank
+            trajectory uses the real published standings for 2024, 2025 and 2026. Every
+            per-destination figure — visa-free, visa on arrival, eTA and visa required — comes from
+            the live visa-rule feed, refreshed weekly, so it can differ slightly from the index score.
           </p>
         </section>
 
