@@ -76,9 +76,11 @@ function AboutPage() {
             passport against all 227 destinations; passports on the same published score share a
             rank. Regional rank re-ranks those same standings inside each region, which is often the
             more useful number: it tells you how a passport compares with its neighbours. Rank
-            trajectory uses the real published standings for 2024, 2025 and 2026. Every
-            per-destination figure — visa-free, visa on arrival, eTA and visa required — comes from
-            the live visa-rule feed, refreshed weekly, so it can differ slightly from the index score.
+            trajectory uses the real published standings for 2024, 2025 and 2026. The headline
+            visa-free, visa-on-arrival, eTA and visa-required counts are the published index figures;
+            the individual country lists come from the live visa-rule feed, refreshed weekly, which
+            covers the indexed countries only.
+
           </p>
         </section>
 

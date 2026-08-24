@@ -218,11 +218,11 @@ function Explorer() {
             <p className="eyebrow">Travel access</p>
             <h2 className="mt-3 text-4xl">Where a {passport.name} passport can go</h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Access rules come from the live visa-rule feed, refreshed weekly, and cover the{" "}
-              {GLOBAL_STATS.countries} indexed countries — the same source as the counts above.
-              Global and regional ranks follow the published {DATA_YEAR} index, which scores all{" "}
-              {TOTAL_DESTINATIONS} destinations, so a higher-ranked passport can show a slightly
-              lower live tally.
+              Headline scores and ranks follow the published {DATA_YEAR} index, which covers all{" "}
+              {TOTAL_DESTINATIONS} destinations. The country lists below come from the live
+              visa-rule feed, refreshed weekly, which covers the {GLOBAL_STATS.countries} indexed
+              countries — so these lists are a subset of the totals above.
+
             </p>
           </Reveal>
 
