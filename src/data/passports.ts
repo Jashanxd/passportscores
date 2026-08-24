@@ -349,7 +349,7 @@ export function accessListFor(p: Passport) {
   const required: Passport[] = [];
   PASSPORTS.forEach((dest, i) => {
     if (dest.iso === p.iso) return;
-    const slot = ((i * 5 + seedShift * 11) % PASSPORTS.length) / PASSPORTS.length;
+    const slot = ((i * i * 7 + i * (seedShift + 3) + seedShift * 29) % PASSPORTS.length) / PASSPORTS.length;
     const scaled = slot * TOTAL_DESTINATIONS;
     if (scaled < p.visaFree) free.push(dest);
     else if (scaled < p.visaFree + p.visaOnArrival) voa.push(dest);
