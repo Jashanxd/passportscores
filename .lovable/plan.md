@@ -42,15 +42,15 @@ down), so the highest rank number is around 100 — not 199. Our table assigns a
 ## Technical notes
 
 - The provider API returns per-destination visa rules only; it has no ranking feed, so
-  ranks stay a curated dataset that we refresh deliberately rather than computing from the
-  feed (computing from the feed is what previously put Germany above Singapore).
-- `ROWS` in `src/data/passports.ts` keeps its tuple shape; only values change, plus
-  `extendHistory` is replaced with real series.
+  ranks stay a curated dataset from the 2026 index that we refresh deliberately.
+- Destination counts are re-derived from the feed in `usePassportData` (sorting/ordering of
+  the rankings table then uses index rank, not the derived counts, so the two never fight).
+- `ROWS` in `src/data/passports.ts` keeps its tuple shape; rank values change and the
+  count columns become fallback-only, plus `extendHistory` is replaced with real series.
 - Regional rank is derived, not typed in, so it can't drift from the global rank.
-- No database or backend changes: the live sync, weekly cron and Travel Access lists are
-  untouched.
+- No database or backend changes: the live sync and weekly cron are untouched.
 
 ## Out of scope
 
-- Changing the Travel Access / divergence lists (those already come from the live feed).
 - Adding new pages or visual redesign.
+
