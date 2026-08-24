@@ -166,6 +166,18 @@ function SiteFooter() {
   );
 }
 
+function DataFreshness() {
+  const status = useDataStatus();
+  const updated = status?.updatedAt ? new Date(status.updatedAt) : null;
+  return (
+    <p>
+      {updated
+        ? `Data updated ${updated.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · source ${status?.source}. Refreshes weekly.`
+        : "Indicative data for editorial use. Always confirm requirements with the embassy."}
+    </p>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
