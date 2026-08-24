@@ -35,8 +35,10 @@ function RankingsPage() {
   const [region, setRegion] = useState<Region | "all">("all");
   const [sort, setSort] = useState<SortKey>("rank");
 
+  const passports = useLivePassports();
+
   const rows = useMemo(() => {
-    const filtered = PASSPORTS.filter(
+    const filtered = passports.filter(
       (p) =>
         (region === "all" || p.region === region) &&
         p.name.toLowerCase().includes(query.trim().toLowerCase()),
