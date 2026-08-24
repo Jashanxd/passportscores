@@ -1,3 +1,5 @@
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { Reveal } from "@/components/Reveal";
@@ -161,42 +163,99 @@ function ComparePage() {
   );
 }
 
+type OverlapView = "shared" | "left" | "right";
+
 function Overlap({ left, right }: { left: Passport; right: Passport }) {
-  const la = accessListFor(left).free;
-  const ra = accessListFor(right).free;
-  const rSet = new Set(ra.map((d) => d.iso));
-  const lSet = new Set(la.map((d) => d.iso));
+  const [view, setView] = useState<OverlapView>("shared");
+  const [query, setQuery] = useState("");
 
-  const shared = la.filter((d) => rSet.has(d.iso));
-  const onlyLeft = la.filter((d) => !rSet.has(d.iso));
-  const onlyRight = ra.filter((d) => !lSet.has(d.iso));
+  const { shared, onlyLeft, onlyRight } = useMemo(() => {
+    const la = accessListFor(left).free;
+    const ra = accessListFor(right).free;
+    const rSet = new Set(ra.map((d) => d.iso));
+    const lSet = new Set(la.map((d) => d.iso));
+    return {
+      shared: la.filter((d) => rSet.has(d.iso)),
+      onlyLeft: la.filter((d) => !rSet.has(d.iso)),
+      onlyRight: ra.filter((d) => !lSet.has(d.iso)),
+    };
+  }, [left, right]);
 
-  const columns = [
-    { title: "Both visa-free", list: shared },
-    { title: `Only ${left.name}`, list: onlyLeft },
-    { title: `Only ${right.name}`, list: onlyRight },
+  const views: { key: OverlapView; title: string; hint: string; list: Passport[]; dot: string }[] = [
+    { key: "shared", title: "Both visa-free", hint: "Open to either passport", list: shared, dot: "bg-access-free" },
+    { key: "left", title: `Only ${left.name}`, hint: `${right.name} needs a visa`, list: onlyLeft, dot: "bg-access-eta" },
+    { key: "right", title: `Only ${right.name}`, hint: `${left.name} needs a visa`, list: onlyRight, dot: "bg-access-voa" },
   ];
+
+  const activeView = views.find((v) => v.key === view)!;
+  const q = query.trim().toLowerCase();
+  const results = activeView.list.filter(
+    (d) => q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q),
+  );
 
   return (
     <Reveal delay={160} className="mt-20">
       <h2 className="text-3xl">Where the access diverges</h2>
-      <div className="mt-8 grid gap-8 sm:grid-cols-3">
-        {columns.map((c) => (
-          <div key={c.title} className="rule-top pt-4">
-            <p className="text-sm font-medium">{c.title}</p>
-            <p className="tnum font-display mt-1 text-3xl">{c.list.length}</p>
-            <ul className="mt-4 max-h-64 space-y-1.5 overflow-y-auto pr-2 text-sm text-muted-foreground">
-              {c.list.map((d) => (
-                <li key={d.iso} className="flex items-center gap-2">
-                  <Flag iso={d.iso} name={d.name} />
-                  <span className="truncate">{d.name}</span>
-                </li>
-              ))}
-              {c.list.length === 0 && <li>None</li>}
-            </ul>
-          </div>
+      <p className="mt-2 max-w-lg text-sm text-muted-foreground">
+        Visa-free destinations grouped by which passport unlocks them.
+      </p>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {views.map((v) => (
+          <button
+            key={v.key}
+            onClick={() => {
+              setView(v.key);
+              setQuery("");
+            }}
+            className={cn(
+              "rounded-xl border p-4 text-left transition-colors",
+              view === v.key
+                ? "border-foreground bg-card"
+                : "border-border hover:border-foreground/40",
+            )}
+          >
+            <span className="flex items-center gap-2 text-sm font-medium">
+              <span className={cn("size-2 rounded-full", v.dot)} />
+              <span className="truncate">{v.title}</span>
+            </span>
+            <span className="tnum font-display mt-2 block text-3xl">{v.list.length}</span>
+            <span className="mt-1 block text-xs text-muted-foreground">{v.hint}</span>
+          </button>
         ))}
       </div>
+
+      <div className="relative mt-6 max-w-sm">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={`Search ${activeView.title.toLowerCase()}…`}
+          aria-label="Search destinations"
+          className="w-full rounded-full border border-border bg-transparent py-2 pr-9 pl-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+
+      <ul className="mt-6 grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
+        {results.map((d) => (
+          <li key={d.iso} className="flex items-center gap-2 border-b border-border/60 py-2 text-sm">
+            <Flag iso={d.iso} name={d.name} />
+            <span className="truncate">{d.name}</span>
+          </li>
+        ))}
+      </ul>
+      {results.length === 0 && (
+        <p className="mt-6 text-sm text-muted-foreground">No destinations match that search.</p>
+      )}
     </Reveal>
   );
 }

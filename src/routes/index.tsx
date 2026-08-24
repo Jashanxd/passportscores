@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search, X } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { PassportCover } from "@/components/PassportCover";
 import { CountrySearch } from "@/components/CountrySearch";
@@ -61,12 +61,23 @@ function Explorer() {
 
   const [tab, setTab] = useState<AccessKind>("free");
   const [region, setRegion] = useState<Region | "all">("all");
+  const [years, setYears] = useState(5);
+  const [query, setQuery] = useState("");
+
+  const trajectory = useMemo(
+    () => passport.history10.slice(passport.history10.length - years),
+    [passport, years],
+  );
 
   const lists = useMemo(() => accessListFor(passport), [passport]);
-  const destinations = useMemo(
-    () => lists[tab].filter((d) => region === "all" || d.region === region),
-    [lists, tab, region],
-  );
+  const destinations = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return lists[tab].filter(
+      (d) =>
+        (region === "all" || d.region === region) &&
+        (q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q)),
+    );
+  }, [lists, tab, region, query]);
 
   return (
     <div>
@@ -170,14 +181,28 @@ function Explorer() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-14 md:grid-cols-2">
           <Reveal>
-            <p className="eyebrow">Five-year trajectory</p>
-            <h2 className="mt-3 text-3xl">Rank movement since {DATA_YEAR - 4}</h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow">Rank trajectory</p>
+                <h2 className="mt-3 text-3xl">Rank movement since {DATA_YEAR - years + 1}</h2>
+              </div>
+              <select
+                value={years}
+                onChange={(e) => setYears(Number(e.target.value))}
+                aria-label="Trajectory period"
+                className="mt-1 rounded-full border border-border bg-transparent px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus:outline-none"
+              >
+                <option value={3}>3Y</option>
+                <option value={5}>5Y</option>
+                <option value={10}>10Y</option>
+              </select>
+            </div>
             <div className="mt-6">
-              <RankSparkline history={passport.history} />
+              <RankSparkline history={trajectory} />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               {passport.name} sits at #{passport.rank} today, from #{passport.prevRank} a year ago.
-              A higher line means a stronger position.
+              Hover the line to read any year. A higher line means a stronger position.
             </p>
           </Reveal>
 
@@ -233,6 +258,28 @@ function Explorer() {
               </button>
             ))}
           </div>
+
+          <div className="relative mt-6 max-w-sm">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search destinations…"
+              aria-label="Search destinations"
+              className="w-full rounded-full border border-border bg-transparent py-2 pr-9 pl-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+
+
 
           <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
             {destinations.map((d) => (

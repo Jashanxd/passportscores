@@ -60,7 +60,7 @@ export function PassportCover({ passport, size = "lg", className, tilt = true }:
             name={passport.name}
             size={80}
             className={cn(
-              "rounded-[1px] opacity-80 mix-blend-luminosity",
+              "rounded-[1px] shadow-sm ring-1 ring-black/10",
               size === "sm" ? "h-4 w-6" : size === "md" ? "h-5 w-7" : "h-7 w-10",
             )}
           />
