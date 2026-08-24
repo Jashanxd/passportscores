@@ -15,6 +15,7 @@ export const Route = createFileRoute("/about")({
       {
         property: "og:description",
         content: "Access categories, ranking rules and the limits of passport mobility data.",
+      },
       { property: "og:url", content: "https://passportscores.com/about" },
       { property: "og:image", content: "https://passportscores.com/og-passport-scores.jpg" },
       { property: "og:image:width", content: "1200" },
