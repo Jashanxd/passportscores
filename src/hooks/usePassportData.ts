@@ -78,11 +78,28 @@ export interface AccessLists {
   required: Passport[];
 }
 
+/** Counts derived from the lists actually shown, so UI numbers always agree. */
+function countsFrom(lists: AccessLists) {
+  return {
+    visaFree: lists.free.length,
+    visaOnArrival: lists.voa.length,
+    eta: lists.eta.length,
+    visaRequired: lists.required.length,
+    totalAccess: lists.free.length + lists.voa.length + lists.eta.length,
+  };
+}
+
+export type AccessCounts = ReturnType<typeof countsFrom>;
+
 /**
  * Real per-destination access for a passport when the provider sync has run,
  * otherwise the bundled estimate (flagged so the UI can say so).
  */
-export function useAccessLists(passport: Passport): { lists: AccessLists; estimated: boolean } {
+export function useAccessLists(passport: Passport): {
+  lists: AccessLists;
+  estimated: boolean;
+  counts: AccessCounts;
+} {
   const { data } = useQuery({
     queryKey: ["access-rules", passport.iso],
     queryFn: () => getAccessRules({ data: { iso: passport.iso } }),
@@ -92,7 +109,10 @@ export function useAccessLists(passport: Passport): { lists: AccessLists; estima
   return useMemo(() => {
     const rules = data ?? {};
     const isoKeys = Object.keys(rules);
-    if (isoKeys.length < 20) return { lists: accessListFor(passport), estimated: true };
+    if (isoKeys.length < 20) {
+      const lists = accessListFor(passport);
+      return { lists, estimated: true, counts: countsFrom(lists) };
+    }
 
     const lists: AccessLists = { free: [], voa: [], eta: [], required: [] };
     for (const dest of PASSPORTS) {
@@ -102,17 +122,16 @@ export function useAccessLists(passport: Passport): { lists: AccessLists; estima
       lists[kind].push(dest);
     }
     const byName = (a: Passport, b: Passport) => a.name.localeCompare(b.name);
-    return {
-      lists: {
-        free: lists.free.sort(byName),
-        voa: lists.voa.sort(byName),
-        eta: lists.eta.sort(byName),
-        required: lists.required.sort(byName),
-      },
-      estimated: false,
+    const sorted: AccessLists = {
+      free: lists.free.sort(byName),
+      voa: lists.voa.sort(byName),
+      eta: lists.eta.sort(byName),
+      required: lists.required.sort(byName),
     };
+    return { lists: sorted, estimated: false, counts: countsFrom(sorted) };
   }, [data, passport]);
 }
+
 
 /** Provenance + freshness of the stored dataset. */
 export function useDataStatus() {

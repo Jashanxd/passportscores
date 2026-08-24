@@ -69,11 +69,16 @@ function ComparePage() {
   const { a, b } = Route.useSearch();
   const navigate = useNavigate({ from: "/compare" });
 
-  const left = useLivePassport(getPassport(a ?? "SG") ?? getPassport("SG")!);
-  const right = useLivePassport(getPassport(b ?? "IN") ?? getPassport("IN")!);
+  const baseLeft = useLivePassport(getPassport(a ?? "SG") ?? getPassport("SG")!);
+  const baseRight = useLivePassport(getPassport(b ?? "IN") ?? getPassport("IN")!);
+  const leftCounts = useAccessLists(baseLeft).counts;
+  const rightCounts = useAccessLists(baseRight).counts;
+  const left = useMemo(() => ({ ...baseLeft, ...leftCounts }), [baseLeft, leftCounts]);
+  const right = useMemo(() => ({ ...baseRight, ...rightCounts }), [baseRight, rightCounts]);
 
   const setSlot = (slot: "a" | "b", iso: string) =>
     navigate({ search: (prev) => ({ ...prev, [slot]: iso }) });
+
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-16">
