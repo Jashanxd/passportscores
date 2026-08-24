@@ -8,8 +8,9 @@ import { CountrySearch } from "@/components/CountrySearch";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { AccessBar } from "@/components/AccessBar";
 import { cn } from "@/lib/utils";
-import { accessListFor, getPassport, type Passport } from "@/data/passports";
+import { getPassport, type Passport } from "@/data/passports";
 import { Flag } from "@/components/Flag";
+import { useAccessLists, useLivePassport } from "@/hooks/usePassportData";
 
 const searchSchema = z.object({
   a: z.string().optional(),
