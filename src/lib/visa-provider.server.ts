@@ -89,7 +89,19 @@ export async function fetchRulesForNationality(
   const headers: Record<string, string> = { accept: "application/json", [config.keyHeader]: config.key };
   if (config.host) headers["x-rapidapi-host"] = config.host;
 
-  const res = await fetch(url, { headers });
+  // visa-requirement.p.rapidapi.com expects a form-encoded POST with `passport`.
+  const usePost = config.url.includes("/visa/map") || process.env["VISA_API_METHOD"] === "POST";
+  let res: Response;
+  if (usePost) {
+    headers["content-type"] = "application/x-www-form-urlencoded";
+    res = await fetch(config.url, {
+      method: "POST",
+      headers,
+      body: new URLSearchParams({ passport: nationality }).toString(),
+    });
+  } else {
+    res = await fetch(url, { headers });
+  }
   if (!res.ok) throw new Error(`provider ${res.status} for ${nationality}`);
   const payload: unknown = await res.json();
 
