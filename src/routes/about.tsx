@@ -15,8 +15,14 @@ export const Route = createFileRoute("/about")({
       {
         property: "og:description",
         content: "Access categories, ranking rules and the limits of passport mobility data.",
-      },
+      { property: "og:url", content: "https://passportscores.com/about" },
+      { property: "og:image", content: "https://passportscores.com/og-passport-scores.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Passport Scores — global travel freedom, measured" },
+      { name: "twitter:image", content: "https://passportscores.com/og-passport-scores.jpg" },
     ],
+    links: [{ rel: "canonical", href: "https://passportscores.com/about" }],
   }),
   component: AboutPage,
 });
