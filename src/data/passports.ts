@@ -324,8 +324,15 @@ export const PASSPORTS: Passport[] = (() => {
   }
   for (const list of byRegion.values()) {
     list.sort((a, b) => a.rank - b.rank);
-    list.forEach((p, i) => {
-      p.regionalRank = i + 1;
+    // Dense ranking: passports tied on the global index share a regional rank.
+    let regional = 0;
+    let lastRank: number | null = null;
+    list.forEach((p) => {
+      if (p.rank !== lastRank) {
+        regional += 1;
+        lastRank = p.rank;
+      }
+      p.regionalRank = regional;
       p.regionalTotal = list.length;
     });
   }
