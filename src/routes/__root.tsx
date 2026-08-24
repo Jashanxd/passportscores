@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { DATA_YEAR } from "../data/passports";
 import { useDataStatus } from "../hooks/usePassportData";
+import psLogo from "../assets/ps-logo.png.asset.json";
 
 function NotFoundComponent() {
   return (
