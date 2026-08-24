@@ -18,57 +18,19 @@ export function useLiveIndex() {
   return useMemo(() => new Map((data ?? []).map((s) => [s.iso, s])), [data]);
 }
 
-/** Merges a live snapshot into the static passport record. */
+/**
+ * Index-level figures (rank, regional rank, YoY, mobility, destination totals and
+ * the access split) always come from the published 2026 index, so every headline
+ * number on the site is internally consistent. The provider feed is used only for
+ * the per-destination Travel Access lists in `useAccessLists`.
+ */
 export function useLivePassport(base: Passport): Passport {
-  const live = useLiveIndex().get(base.iso);
-  return useMemo(() => {
-    if (!live) return base;
-    const totalAccess = live.visaFree + live.visaOnArrival + live.eta;
-    const history = live.history.length >= 3 ? live.history : base.history10;
-    return {
-      ...base,
-      // Global/regional standing stays on the published 2026 index; the provider
-      // feed only refreshes per-destination access counts.
-      rank: base.rank,
-      prevRank: base.prevRank,
-      rankDelta: base.rankDelta,
-      regionalRank: base.regionalRank,
-      visaFree: live.visaFree,
-      visaOnArrival: live.visaOnArrival,
-      eta: live.eta,
-      visaRequired: live.visaRequired,
-      totalAccess,
-      mobility: base.mobility,
-      history10: history.length >= 10 ? history.slice(-10) : [...base.history10.slice(0, 10 - history.length), ...history],
-    };
-  }, [base, live]);
+  return base;
 }
 
-/** The whole index, with live snapshot values merged in where available. */
+/** The published 2026 index, ordered by rank. */
 export function useLivePassports(): Passport[] {
-  const index = useLiveIndex();
-  return useMemo(() => {
-    if (index.size === 0) return PASSPORTS;
-    const merged = PASSPORTS.map((base) => {
-      const live = index.get(base.iso);
-      if (!live) return base;
-      const totalAccess = live.visaFree + live.visaOnArrival + live.eta;
-      return {
-        ...base,
-        rank: base.rank,
-        prevRank: base.prevRank,
-        rankDelta: base.rankDelta,
-        regionalRank: base.regionalRank,
-        visaFree: live.visaFree,
-        visaOnArrival: live.visaOnArrival,
-        eta: live.eta,
-        visaRequired: live.visaRequired,
-        totalAccess,
-        mobility: base.mobility,
-      };
-    });
-    return merged.sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
-  }, [index]);
+  return PASSPORTS;
 }
 
 export interface AccessLists {
