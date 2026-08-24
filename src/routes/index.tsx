@@ -44,7 +44,14 @@ export const Route = createFileRoute("/")({
         content:
           "Search any country to see its passport cover, ranking and full travel-access breakdown.",
       },
+      { property: "og:url", content: "https://passportscores.com/" },
+      { property: "og:image", content: "https://passportscores.com/og-passport-scores.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Passport Scores — global travel freedom, measured" },
+      { name: "twitter:image", content: "https://passportscores.com/og-passport-scores.jpg" },
     ],
+    links: [{ rel: "canonical", href: "https://passportscores.com/" }],
   }),
   component: Explorer,
 });
