@@ -53,7 +53,7 @@ export const getLiveIndex = createServerFn({ method: "GET" }).handler(async (): 
       visaRequired: latest.visa_required,
       mobility: Number(latest.mobility),
       prevRank: prev ? prev.rank : null,
-      history: rows.map((r) => r.rank),
+      history: rows.map((r: { rank: number }) => r.rank),
     };
   });
 });
