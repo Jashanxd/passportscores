@@ -65,9 +65,10 @@ function Explorer() {
   const [years, setYears] = useState(5);
   const [query, setQuery] = useState("");
 
-  const { lists, estimated, counts } = useAccessLists(base);
-  // Numbers shown always match the destination lists rendered below.
-  const passport = useMemo(() => ({ ...base, ...counts }), [base, counts]);
+  const { lists, estimated } = useAccessLists(base);
+  // Headline figures come from the published index; the tabs below label their own
+  // list lengths, which are sourced from the visa-rule feed.
+  const passport = base;
 
   const trajectory = useMemo(
     () => passport.history10.slice(passport.history10.length - years),
