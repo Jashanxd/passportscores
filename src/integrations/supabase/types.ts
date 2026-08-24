@@ -14,7 +14,152 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      countries: {
+        Row: {
+          cover: string
+          created_at: string
+          iso: string
+          name: string
+          region: string
+        }
+        Insert: {
+          cover: string
+          created_at?: string
+          iso: string
+          name: string
+          region: string
+        }
+        Update: {
+          cover?: string
+          created_at?: string
+          iso?: string
+          name?: string
+          region?: string
+        }
+        Relationships: []
+      }
+      data_sync_runs: {
+        Row: {
+          finished_at: string | null
+          id: string
+          message: string | null
+          rows_upserted: number
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          rows_upserted?: number
+          source: string
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          finished_at?: string | null
+          id?: string
+          message?: string | null
+          rows_upserted?: number
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      passport_snapshots: {
+        Row: {
+          captured_at: string
+          created_at: string
+          eta: number
+          id: string
+          iso: string
+          mobility: number
+          rank: number
+          regional_rank: number
+          source: string
+          visa_free: number
+          visa_on_arrival: number
+          visa_required: number
+        }
+        Insert: {
+          captured_at?: string
+          created_at?: string
+          eta?: number
+          id?: string
+          iso: string
+          mobility?: number
+          rank: number
+          regional_rank?: number
+          source?: string
+          visa_free?: number
+          visa_on_arrival?: number
+          visa_required?: number
+        }
+        Update: {
+          captured_at?: string
+          created_at?: string
+          eta?: number
+          id?: string
+          iso?: string
+          mobility?: number
+          rank?: number
+          regional_rank?: number
+          source?: string
+          visa_free?: number
+          visa_on_arrival?: number
+          visa_required?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passport_snapshots_iso_fkey"
+            columns: ["iso"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["iso"]
+          },
+        ]
+      }
+      visa_rules: {
+        Row: {
+          access: string
+          destination_iso: string
+          nationality_iso: string
+          note: string | null
+          updated_at: string
+        }
+        Insert: {
+          access: string
+          destination_iso: string
+          nationality_iso: string
+          note?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access?: string
+          destination_iso?: string
+          nationality_iso?: string
+          note?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visa_rules_destination_iso_fkey"
+            columns: ["destination_iso"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["iso"]
+          },
+          {
+            foreignKeyName: "visa_rules_nationality_iso_fkey"
+            columns: ["nationality_iso"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["iso"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
