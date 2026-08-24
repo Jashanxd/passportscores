@@ -100,12 +100,28 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           let written = 0;
           const failures: string[] = [];
 
-          for (let i = 0; i < batch.length; i += 6) {
-            const chunk = batch.slice(i, i + 6);
+          const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+          const fetchWithRetry = async (iso: string) => {
+            let lastErr: unknown;
+            for (let attempt = 0; attempt < 4; attempt++) {
+              try {
+                const rules = await fetchRulesForNationality(config, iso, knownIso);
+                if (Object.keys(rules).length > 0) return rules;
+                lastErr = new Error("empty response");
+              } catch (err) {
+                lastErr = err;
+              }
+              await sleep(400 * (attempt + 1));
+            }
+            throw lastErr instanceof Error ? lastErr : new Error("provider failed");
+          };
+
+          for (let i = 0; i < batch.length; i += 4) {
+            const chunk = batch.slice(i, i + 4);
             await Promise.all(
               chunk.map(async (p) => {
                 try {
-                  const rules = await fetchRulesForNationality(config, p.iso, knownIso);
+                  const rules = await fetchWithRetry(p.iso);
                   const rows = Object.entries(rules).map(([destination_iso, access]) => ({
                     nationality_iso: p.iso,
                     destination_iso,
