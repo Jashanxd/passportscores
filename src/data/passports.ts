@@ -254,6 +254,25 @@ export interface Passport {
   accessDelta: number;
   mobility: number;
   history: number[];
+  /** 10-year rank series (older years extrapolated deterministically). */
+  history10: number[];
+}
+
+/**
+ * Builds a stable 10-year rank series by extrapolating five extra years
+ * backwards from the oldest known value with a per-country seed.
+ */
+function extendHistory(iso: string, history: number[]): number[] {
+  const seed = [...iso].reduce((s, c) => s + c.charCodeAt(0) * 7, 0);
+  const oldest = history[0]!;
+  const earlier: number[] = [];
+  let v = oldest;
+  for (let i = 0; i < 5; i++) {
+    const swing = (((seed + i * 31) % 11) - 5) + Math.round(oldest * 0.06);
+    v = Math.max(1, Math.min(110, v + swing));
+    earlier.unshift(v);
+  }
+  return [...earlier, ...history];
 }
 
 function flagOf(iso: string) {
@@ -287,6 +306,7 @@ export const PASSPORTS: Passport[] = (() => {
         accessDelta,
         mobility,
         history,
+        history10: extendHistory(iso, history),
       } satisfies Passport;
     },
   );
@@ -356,7 +376,13 @@ export function accessListFor(p: Passport) {
     else if (scaled < p.totalAccess) etaList.push(dest);
     else required.push(dest);
   });
-  return { free, voa, eta: etaList, required };
+  const byName = (a: Passport, b: Passport) => a.name.localeCompare(b.name);
+  return {
+    free: free.sort(byName),
+    voa: voa.sort(byName),
+    eta: etaList.sort(byName),
+    required: required.sort(byName),
+  };
 }
 
 export function accessKindFor(p: Passport, destIso: string): AccessKind {
