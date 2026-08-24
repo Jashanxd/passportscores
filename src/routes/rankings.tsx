@@ -64,7 +64,7 @@ function RankingsPage() {
 
       <Reveal delay={80} className="mt-14">
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-5">
-          {top.map((p, i) => (
+          {top.map((p: Passport, i: number) => (
             <Link
               key={p.iso}
               to="/"
