@@ -28,10 +28,12 @@ export function useLivePassport(base: Passport): Passport {
     const history = live.history.length >= 3 ? live.history : base.history10;
     return {
       ...base,
-      rank: live.rank,
-      prevRank,
-      rankDelta: prevRank - live.rank,
-      regionalRank: live.regionalRank || base.regionalRank,
+      // Global/regional standing stays on the published 2026 index; the provider
+      // feed only refreshes per-destination access counts.
+      rank: base.rank,
+      prevRank: base.prevRank,
+      rankDelta: base.rankDelta,
+      regionalRank: base.regionalRank,
       visaFree: live.visaFree,
       visaOnArrival: live.visaOnArrival,
       eta: live.eta,
@@ -55,10 +57,10 @@ export function useLivePassports(): Passport[] {
       const prevRank = live.prevRank ?? base.prevRank;
       return {
         ...base,
-        rank: live.rank,
-        prevRank,
-        rankDelta: prevRank - live.rank,
-        regionalRank: live.regionalRank || base.regionalRank,
+        rank: base.rank,
+        prevRank: base.prevRank,
+        rankDelta: base.rankDelta,
+        regionalRank: base.regionalRank,
         visaFree: live.visaFree,
         visaOnArrival: live.visaOnArrival,
         eta: live.eta,
