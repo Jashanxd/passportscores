@@ -220,7 +220,7 @@ function Explorer() {
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
               Headline scores and ranks follow the published {DATA_YEAR} index, which covers all{" "}
               {TOTAL_DESTINATIONS} destinations. The country lists below come from the live
-              visa-rule feed, refreshed weekly, which covers the {GLOBAL_STATS.countries} indexed
+              visa-rule feed, refreshed monthly, which covers the {GLOBAL_STATS.countries} indexed
               countries — so these lists are a subset of the totals above.
 
             </p>

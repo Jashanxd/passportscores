@@ -186,7 +186,7 @@ function DataFreshness() {
   return (
     <p>
       {updated
-        ? `Visa rules updated ${updated.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · refreshes weekly. Ranks follow the ${DATA_YEAR} index; all destination counts come from the live feed.`
+        ? `Visa rules updated ${updated.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · refreshes monthly. Ranks follow the ${DATA_YEAR} index; all destination counts come from the live feed.`
         : "Indicative data for editorial use. Always confirm requirements with the embassy."}
     </p>
   );

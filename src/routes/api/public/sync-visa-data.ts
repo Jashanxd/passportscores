@@ -10,7 +10,7 @@ const BodySchema = z
   .default({});
 
 /**
- * Weekly ingestion endpoint. Bootstraps country/snapshot rows from the bundled
+  * Monthly ingestion endpoint. Bootstraps country/snapshot rows from the bundled
  * reference table, then (when a provider key is configured) pulls the real
  * per-nationality visa matrix and recomputes ranks from it.
  */
