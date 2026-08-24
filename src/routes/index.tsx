@@ -15,6 +15,7 @@ import { Flag } from "@/components/Flag";
 import {
   ACCESS_LABELS,
   DATA_YEAR,
+  HISTORY_YEARS,
   GLOBAL_STATS,
   PASSPORTS,
   REGIONS,
@@ -62,7 +63,6 @@ function Explorer() {
 
   const [tab, setTab] = useState<AccessKind>("free");
   const [region, setRegion] = useState<Region | "all">("all");
-  const [years, setYears] = useState(5);
   const [query, setQuery] = useState("");
 
   const { lists, estimated } = useAccessLists(base);
@@ -70,10 +70,7 @@ function Explorer() {
   // list lengths, which are sourced from the visa-rule feed.
   const passport = base;
 
-  const trajectory = useMemo(
-    () => passport.history10.slice(passport.history10.length - years),
-    [passport, years],
-  );
+  const trajectory = passport.history;
 
   const destinations = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -190,18 +187,11 @@ function Explorer() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="eyebrow">Rank trajectory</p>
-                <h2 className="mt-3 text-3xl">Rank movement since {DATA_YEAR - years + 1}</h2>
+                <h2 className="mt-3 text-3xl">Rank movement since {HISTORY_YEARS[0]}</h2>
               </div>
-              <select
-                value={years}
-                onChange={(e) => setYears(Number(e.target.value))}
-                aria-label="Trajectory period"
-                className="mt-1 rounded-full border border-border bg-transparent px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus:outline-none"
-              >
-                <option value={3}>3Y</option>
-                <option value={5}>5Y</option>
-                <option value={10}>10Y</option>
-              </select>
+              <span className="mt-1 rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground">
+                {HISTORY_YEARS[0]}–{HISTORY_YEARS[HISTORY_YEARS.length - 1]}
+              </span>
             </div>
             <div className="mt-6">
               <RankSparkline history={trajectory} />
