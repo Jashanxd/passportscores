@@ -97,15 +97,25 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           // 2. Pull the real matrix, prioritising nationalities we have never
           //    fetched (providers meter requests, so each run tops up coverage).
           const knownIso = new Set(PASSPORTS.map((p) => p.iso));
-          const { data: covered } = await supabaseAdmin
-            .from("visa_rules")
-            .select("nationality_iso")
-            .limit(60000);
-          const have = new Set((covered ?? []).map((r) => r.nationality_iso));
+          // The Data API caps a single response at 1000 rows, so page through
+          // the matrix to learn which nationalities already have real rules.
+          const have = new Set<string>();
+          const PAGE = 1000;
+          for (let from = 0; from < 200_000; from += PAGE) {
+            const { data: page, error } = await supabaseAdmin
+              .from("visa_rules")
+              .select("nationality_iso")
+              .order("nationality_iso", { ascending: true })
+              .range(from, from + PAGE - 1);
+            if (error) throw new Error(`coverage: ${error.message}`);
+            for (const row of page ?? []) have.add(row.nationality_iso);
+            if (!page || page.length < PAGE) break;
+          }
           const ordered = [
             ...PASSPORTS.filter((p) => !have.has(p.iso)),
             ...PASSPORTS.filter((p) => have.has(p.iso)),
           ];
+
           const batch = ordered.slice(offset, offset + limit);
           let written = 0;
           const failures: string[] = [];
