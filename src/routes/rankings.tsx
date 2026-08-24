@@ -40,7 +40,7 @@ function RankingsPage() {
 
   const rows = useMemo(() => {
     const filtered = passports.filter(
-      (p) =>
+      (p: Passport) =>
         (region === "all" || p.region === region) &&
         p.name.toLowerCase().includes(query.trim().toLowerCase()),
     );
@@ -49,9 +49,9 @@ function RankingsPage() {
     else if (sort === "change") sorted.sort((a, b) => b.rankDelta - a.rankDelta);
     else sorted.sort((a, b) => a.rank - b.rank);
     return sorted;
-  }, [query, region, sort]);
+  }, [passports, query, region, sort]);
 
-  const top = PASSPORTS.slice(0, 5);
+  const top = passports.slice(0, 5);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
