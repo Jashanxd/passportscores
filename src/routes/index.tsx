@@ -65,9 +65,10 @@ function Explorer() {
   const [years, setYears] = useState(5);
   const [query, setQuery] = useState("");
 
-  const { lists, estimated, counts } = useAccessLists(base);
-  // Numbers shown always match the destination lists rendered below.
-  const passport = useMemo(() => ({ ...base, ...counts }), [base, counts]);
+  const { lists, estimated } = useAccessLists(base);
+  // Headline figures come from the published index; the tabs below label their own
+  // list lengths, which are sourced from the visa-rule feed.
+  const passport = base;
 
   const trajectory = useMemo(
     () => passport.history10.slice(passport.history10.length - years),
@@ -226,6 +227,12 @@ function Explorer() {
           <Reveal>
             <p className="eyebrow">Travel access</p>
             <h2 className="mt-3 text-4xl">Where a {passport.name} passport can go</h2>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              Per-country rules come from the live visa-rule feed and cover the{" "}
+              {GLOBAL_STATS.countries} indexed countries, so these tallies run slightly below the
+              headline totals above, which count all {TOTAL_DESTINATIONS} destinations in the{" "}
+              {DATA_YEAR} index.
+            </p>
           </Reveal>
 
           <div className="mt-10 flex flex-wrap gap-2">
