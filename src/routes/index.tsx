@@ -74,7 +74,7 @@ function Explorer() {
   const destinations = useMemo(() => {
     const q = query.trim().toLowerCase();
     return lists[tab].filter(
-      (d) =>
+      (d: Passport) =>
         (region === "all" || d.region === region) &&
         (q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q)),
     );
