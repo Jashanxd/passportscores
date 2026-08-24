@@ -94,18 +94,50 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
             );
           }
 
-          // 2. Pull the real matrix, nationality by nationality.
+          // 2. Pull the real matrix, prioritising nationalities we have never
+          //    fetched (providers meter requests, so each run tops up coverage).
           const knownIso = new Set(PASSPORTS.map((p) => p.iso));
-          const batch = PASSPORTS.slice(offset, offset + limit);
+          const { data: covered } = await supabaseAdmin
+            .from("visa_rules")
+            .select("nationality_iso")
+            .limit(60000);
+          const have = new Set((covered ?? []).map((r) => r.nationality_iso));
+          const ordered = [
+            ...PASSPORTS.filter((p) => !have.has(p.iso)),
+            ...PASSPORTS.filter((p) => have.has(p.iso)),
+          ];
+          const batch = ordered.slice(offset, offset + limit);
           let written = 0;
           const failures: string[] = [];
+          let quotaExhausted = false;
 
-          for (let i = 0; i < batch.length; i += 6) {
-            const chunk = batch.slice(i, i + 6);
+          const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+          const fetchWithRetry = async (iso: string) => {
+            let lastErr: unknown;
+            for (let attempt = 0; attempt < 3; attempt++) {
+              try {
+                const rules = await fetchRulesForNationality(config, iso, knownIso);
+                if (Object.keys(rules).length > 0) return rules;
+                lastErr = new Error("empty response");
+              } catch (err) {
+                lastErr = err;
+                if (err instanceof Error && /\b429\b/.test(err.message)) {
+                  quotaExhausted = true;
+                  throw err;
+                }
+              }
+              await sleep(400 * (attempt + 1));
+            }
+            throw lastErr instanceof Error ? lastErr : new Error("provider failed");
+          };
+
+          for (let i = 0; i < batch.length; i += 4) {
+            if (quotaExhausted) break;
+            const chunk = batch.slice(i, i + 4);
             await Promise.all(
               chunk.map(async (p) => {
                 try {
-                  const rules = await fetchRulesForNationality(config, p.iso, knownIso);
+                  const rules = await fetchWithRetry(p.iso);
                   const rows = Object.entries(rules).map(([destination_iso, access]) => ({
                     nationality_iso: p.iso,
                     destination_iso,
@@ -135,9 +167,11 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           });
           if (rpcErr) throw new Error(`recompute: ${rpcErr.message}`);
 
-          const message = failures.length
-            ? `Synced ${written} rules. No data for: ${failures.slice(0, 12).join(", ")}${failures.length > 12 ? "…" : ""}`
-            : `Synced ${written} rules for ${batch.length} passports.`;
+          const message = quotaExhausted
+            ? `Provider request quota reached. Synced ${written} rules this run; remaining passports will be topped up on the next run.`
+            : failures.length
+              ? `Synced ${written} rules. No data for: ${failures.slice(0, 12).join(", ")}${failures.length > 12 ? "…" : ""}`
+              : `Synced ${written} rules for ${batch.length} passports.`;
           return await finish(failures.length ? "partial" : "success", written, message);
         } catch (err) {
           return await finish("failed", 0, err instanceof Error ? err.message : "Unknown error");

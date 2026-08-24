@@ -89,7 +89,19 @@ export async function fetchRulesForNationality(
   const headers: Record<string, string> = { accept: "application/json", [config.keyHeader]: config.key };
   if (config.host) headers["x-rapidapi-host"] = config.host;
 
-  const res = await fetch(url, { headers });
+  // visa-requirement.p.rapidapi.com expects a form-encoded POST with `passport`.
+  const usePost = config.url.includes("/visa/map") || process.env["VISA_API_METHOD"] === "POST";
+  let res: Response;
+  if (usePost) {
+    headers["content-type"] = "application/x-www-form-urlencoded";
+    res = await fetch(config.url, {
+      method: "POST",
+      headers,
+      body: new URLSearchParams({ passport: nationality }).toString(),
+    });
+  } else {
+    res = await fetch(url, { headers });
+  }
   if (!res.ok) throw new Error(`provider ${res.status} for ${nationality}`);
   const payload: unknown = await res.json();
 
@@ -107,6 +119,26 @@ export async function fetchRulesForNationality(
       consider(entry.code ?? entry.iso ?? entry.destination ?? entry.country, entry.requirement ?? entry.status ?? entry.visa ?? entry.access);
     }
   };
+
+  // Shape Z: visa-requirement /v2/visa/map -> { data: { colors: { green, yellow, blue, red } } }
+  const colours = (payload as { data?: { colors?: Record<string, string> } } | null)?.data?.colors;
+  if (colours && typeof colours === "object") {
+    const legend: Record<string, AccessKind> = {
+      green: "free",
+      yellow: "voa",
+      blue: "eta",
+      red: "required",
+    };
+    for (const [colour, kind] of Object.entries(legend)) {
+      const csv = colours[colour];
+      if (typeof csv !== "string") continue;
+      for (const iso of csv.split(",")) {
+        const code = iso.trim().toUpperCase();
+        if (code.length === 2 && knownIso.has(code) && code !== nationality.toUpperCase()) out[code] = kind;
+      }
+    }
+    if (Object.keys(out).length > 0) return out;
+  }
 
   if (Array.isArray(payload)) {
     walkList(payload as ProviderEntry[]);
