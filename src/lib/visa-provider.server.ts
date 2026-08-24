@@ -102,7 +102,20 @@ export async function fetchRulesForNationality(
   } else {
     res = await fetch(url, { headers });
   }
-  if (!res.ok) throw new Error(`provider ${res.status} for ${nationality}`);
+  if (!res.ok) {
+    // RapidAPI uses 429 for both the per-second throttle (retryable) and an
+    // exhausted monthly plan (not retryable). Only the latter reports 0 or
+    // fewer remaining requests.
+    let remaining: number | null = null;
+    const header = res.headers.get("x-ratelimit-requests-remaining");
+    if (header !== null && header.trim() !== "") remaining = Number(header);
+    const monthlyExhausted =
+      res.status === 429 && remaining !== null && Number.isFinite(remaining) && remaining <= 0;
+    throw new Error(
+      `provider ${res.status}${monthlyExhausted ? " quota-exhausted" : ""} for ${nationality}`,
+    );
+  }
+
   const payload: unknown = await res.json();
 
   const out: Record<string, AccessKind> = {};
