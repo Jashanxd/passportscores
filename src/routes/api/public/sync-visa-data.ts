@@ -167,9 +167,11 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           });
           if (rpcErr) throw new Error(`recompute: ${rpcErr.message}`);
 
-          const message = failures.length
-            ? `Synced ${written} rules. No data for: ${failures.slice(0, 12).join(", ")}${failures.length > 12 ? "…" : ""}`
-            : `Synced ${written} rules for ${batch.length} passports.`;
+          const message = quotaExhausted
+            ? `Provider request quota reached. Synced ${written} rules this run; remaining passports will be topped up on the next run.`
+            : failures.length
+              ? `Synced ${written} rules. No data for: ${failures.slice(0, 12).join(", ")}${failures.length > 12 ? "…" : ""}`
+              : `Synced ${written} rules for ${batch.length} passports.`;
           return await finish(failures.length ? "partial" : "success", written, message);
         } catch (err) {
           return await finish("failed", 0, err instanceof Error ? err.message : "Unknown error");
