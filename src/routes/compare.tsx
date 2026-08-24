@@ -170,17 +170,20 @@ function Overlap({ left, right }: { left: Passport; right: Passport }) {
   const [view, setView] = useState<OverlapView>("shared");
   const [query, setQuery] = useState("");
 
+  const leftAccess = useAccessLists(left);
+  const rightAccess = useAccessLists(right);
+
   const { shared, onlyLeft, onlyRight } = useMemo(() => {
-    const la = accessListFor(left).free;
-    const ra = accessListFor(right).free;
-    const rSet = new Set(ra.map((d) => d.iso));
-    const lSet = new Set(la.map((d) => d.iso));
+    const la = leftAccess.lists.free;
+    const ra = rightAccess.lists.free;
+    const rSet = new Set(ra.map((d: Passport) => d.iso));
+    const lSet = new Set(la.map((d: Passport) => d.iso));
     return {
-      shared: la.filter((d) => rSet.has(d.iso)),
-      onlyLeft: la.filter((d) => !rSet.has(d.iso)),
-      onlyRight: ra.filter((d) => !lSet.has(d.iso)),
+      shared: la.filter((d: Passport) => rSet.has(d.iso)),
+      onlyLeft: la.filter((d: Passport) => !rSet.has(d.iso)),
+      onlyRight: ra.filter((d: Passport) => !lSet.has(d.iso)),
     };
-  }, [left, right]);
+  }, [leftAccess, rightAccess]);
 
   const views: { key: OverlapView; title: string; hint: string; list: Passport[]; dot: string }[] = [
     { key: "shared", title: "Both visa-free", hint: "Open to either passport", list: shared, dot: "bg-access-free" },
