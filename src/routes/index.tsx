@@ -12,6 +12,7 @@ import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { cn } from "@/lib/utils";
 import {
+import { Flag } from "@/components/Flag";
   ACCESS_LABELS,
   DATA_YEAR,
   GLOBAL_STATS,
@@ -240,7 +241,7 @@ function Explorer() {
                   onClick={() => navigate({ search: { country: d.iso } })}
                   className="flex w-full items-center gap-2 text-left text-sm hover:text-primary"
                 >
-                  <span className="leading-none">{d.flag}</span>
+                  <Flag iso={d.iso} name={d.name} />
                   <span className="truncate">{d.name}</span>
                 </button>
               </li>
@@ -280,7 +281,7 @@ function Explorer() {
                   <span className="tnum font-display w-8 text-2xl text-muted-foreground">
                     {p.rank}
                   </span>
-                  <span className="leading-none">{p.flag}</span>
+                  <Flag iso={p.iso} name={p.name} />
                   <span className="flex-1 truncate">{p.name}</span>
                   <span className="tnum text-sm text-muted-foreground">{p.totalAccess}</span>
                 </button>

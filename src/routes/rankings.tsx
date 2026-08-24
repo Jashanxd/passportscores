@@ -7,6 +7,7 @@ import { DeltaBadge } from "@/components/DeltaBadge";
 import { PassportCover } from "@/components/PassportCover";
 import { cn } from "@/lib/utils";
 import { DATA_YEAR, PASSPORTS, REGIONS, REGION_LABELS, type Region } from "@/data/passports";
+import { Flag } from "@/components/Flag";
 
 export const Route = createFileRoute("/rankings")({
   head: () => ({
@@ -139,7 +140,7 @@ function RankingsPage() {
                     search={{ country: p.iso }}
                     className="flex items-center gap-3 hover:text-primary"
                   >
-                    <span className="text-base leading-none">{p.flag}</span>
+                    <Flag iso={p.iso} name={p.name} />
                     {p.name}
                   </Link>
                 </td>

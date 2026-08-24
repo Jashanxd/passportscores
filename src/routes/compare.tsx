@@ -7,6 +7,7 @@ import { DeltaBadge } from "@/components/DeltaBadge";
 import { AccessBar } from "@/components/AccessBar";
 import { cn } from "@/lib/utils";
 import { accessListFor, getPassport, type Passport } from "@/data/passports";
+import { Flag } from "@/components/Flag";
 
 const searchSchema = z.object({
   a: z.string().optional(),
@@ -187,7 +188,7 @@ function Overlap({ left, right }: { left: Passport; right: Passport }) {
             <ul className="mt-4 max-h-64 space-y-1.5 overflow-y-auto pr-2 text-sm text-muted-foreground">
               {c.list.map((d) => (
                 <li key={d.iso} className="flex items-center gap-2">
-                  <span className="leading-none">{d.flag}</span>
+                  <Flag iso={d.iso} name={d.name} />
                   <span className="truncate">{d.name}</span>
                 </li>
               ))}

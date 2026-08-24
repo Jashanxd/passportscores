@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { Passport } from "@/data/passports";
+import { Flag } from "@/components/Flag";
 
 const COVER_BG: Record<string, string> = {
   burgundy: "bg-cover-burgundy",
@@ -54,7 +55,15 @@ export function PassportCover({ passport, size = "lg", className, tilt = true }:
             size === "sm" ? "size-9 text-base" : size === "md" ? "size-12 text-xl" : "size-16 text-2xl",
           )}
         >
-          <span className="drop-shadow-sm">{passport.flag}</span>
+          <Flag
+            iso={passport.iso}
+            name={passport.name}
+            size={80}
+            className={cn(
+              "rounded-[1px] opacity-80 mix-blend-luminosity",
+              size === "sm" ? "h-4 w-6" : size === "md" ? "h-5 w-7" : "h-7 w-10",
+            )}
+          />
         </div>
       </div>
 

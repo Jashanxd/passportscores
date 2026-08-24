@@ -12,6 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { PASSPORTS, getPassport } from "@/data/passports";
+import { Flag } from "@/components/Flag";
 
 interface Props {
   value?: string | null | undefined;
@@ -47,7 +48,7 @@ export function CountrySearch({
           <span className="flex min-w-0 items-center gap-3">
             {selected ? (
               <>
-                <span className="text-lg leading-none">{selected.flag}</span>
+                <Flag iso={selected.iso} name={selected.name} />
                 <span className="truncate">{selected.name}</span>
                 <span className="tnum text-muted-foreground">#{selected.rank}</span>
               </>
@@ -81,7 +82,7 @@ export function CountrySearch({
                   }}
                   className="gap-3"
                 >
-                  <span className="text-base leading-none">{p.flag}</span>
+                  <Flag iso={p.iso} name={p.name} />
                   <span className="flex-1 truncate">{p.name}</span>
                   <span className="tnum text-xs text-muted-foreground">#{p.rank}</span>
                   {value === p.iso && <Check className="size-4 text-primary" />}
