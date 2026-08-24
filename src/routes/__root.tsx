@@ -159,9 +159,12 @@ function SiteFooter() {
     <footer className="mt-24 border-t border-border">
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-10 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
         <p>
-          Passport Index — a {DATA_YEAR} study of global mobility across 227 destinations.
+          Passport Scores — a {DATA_YEAR} study of global mobility across 227 destinations.
         </p>
         <DataFreshness />
+      </div>
+      <div className="mx-auto max-w-6xl px-6 pb-8 text-[11px] tracking-wide text-muted-foreground">
+        Made by — Jashan Chaudhary
       </div>
     </footer>
   );
