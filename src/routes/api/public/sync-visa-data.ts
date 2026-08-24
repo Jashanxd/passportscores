@@ -114,26 +114,28 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
           const fetchWithRetry = async (iso: string) => {
             let lastErr: unknown;
-            for (let attempt = 0; attempt < 3; attempt++) {
+            for (let attempt = 0; attempt < 5; attempt++) {
               try {
                 const rules = await fetchRulesForNationality(config, iso, knownIso);
                 if (Object.keys(rules).length > 0) return rules;
                 lastErr = new Error("empty response");
               } catch (err) {
                 lastErr = err;
-                if (err instanceof Error && /\b429\b/.test(err.message)) {
+                if (err instanceof Error && /quota-exhausted/.test(err.message)) {
                   quotaExhausted = true;
                   throw err;
                 }
               }
-              await sleep(400 * (attempt + 1));
+              // Back off on transient errors, including the provider's
+              // per-second throttle (429 with quota remaining).
+              await sleep(700 * (attempt + 1));
             }
             throw lastErr instanceof Error ? lastErr : new Error("provider failed");
           };
 
-          for (let i = 0; i < batch.length; i += 4) {
+          for (let i = 0; i < batch.length; i += 2) {
             if (quotaExhausted) break;
-            const chunk = batch.slice(i, i + 4);
+            const chunk = batch.slice(i, i + 2);
             await Promise.all(
               chunk.map(async (p) => {
                 try {
@@ -159,7 +161,9 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
                 }
               }),
             );
+            await sleep(350);
           }
+
 
           // 3. Recompute counts and ranks from the stored rules.
           const { error: rpcErr } = await supabaseAdmin.rpc("recompute_passport_snapshot", {
