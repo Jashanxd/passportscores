@@ -144,10 +144,7 @@ function SiteHeader() {
             height={28}
             className="h-7 w-7 shrink-0 rounded-full"
           />
-          <span className="font-display text-xl leading-none tracking-tight">Passport Scores</span>
-          <span className="hidden text-[10px] tracking-[0.2em] text-muted-foreground uppercase sm:inline">
-            {DATA_YEAR}
-          </span>
+          <span className="font-display text-2xl leading-none tracking-tight">Passport Scores</span>
         </Link>
         <nav className="flex items-center gap-1">
           {NAV.map((item) => (
