@@ -160,7 +160,7 @@ function SiteFooter() {
         <p>
           Passport Index — a {DATA_YEAR} study of global mobility across 227 destinations.
         </p>
-        <p>Indicative data for editorial use. Always confirm requirements with the embassy.</p>
+        <DataFreshness />
       </div>
     </footer>
   );
