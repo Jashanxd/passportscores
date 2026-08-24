@@ -247,6 +247,9 @@ export interface Passport {
   rankDelta: number;
   regionalRank: number;
   regionalTotal: number;
+  /** Published visa-free score for the current index edition. */
+  indexScore: number;
+  prevIndexScore: number;
   visaFree: number;
   visaOnArrival: number;
   eta: number;
@@ -255,27 +258,12 @@ export interface Passport {
   prevAccess: number;
   accessDelta: number;
   mobility: number;
+  /** Real published rank series, oldest first (one point per edition year). */
   history: number[];
-  /** 10-year rank series (older years extrapolated deterministically). */
-  history10: number[];
 }
 
-/**
- * Builds a stable 10-year rank series by extrapolating five extra years
- * backwards from the oldest known value with a per-country seed.
- */
-function extendHistory(iso: string, history: number[]): number[] {
-  const seed = [...iso].reduce((s, c) => s + c.charCodeAt(0) * 7, 0);
-  const oldest = history[0]!;
-  const earlier: number[] = [];
-  let v = oldest;
-  for (let i = 0; i < 5; i++) {
-    const swing = (((seed + i * 31) % 11) - 5) + Math.round(oldest * 0.06);
-    v = Math.max(1, Math.min(110, v + swing));
-    earlier.unshift(v);
-  }
-  return [...earlier, ...history];
-}
+/** Years covered by `history`, aligned index-for-index. */
+export const HISTORY_YEARS = [2024, 2025, 2026];
 
 function flagOf(iso: string) {
   const code = iso === "KOS" ? "XK" : iso;
@@ -284,9 +272,23 @@ function flagOf(iso: string) {
 
 export const PASSPORTS: Passport[] = (() => {
   const base = ROWS.map(
-    ([iso, name, region, cover, rank, prevRank, visaFree, visaOnArrival, eta, visaRequired, mobility, history]) => {
+    ([
+      iso,
+      name,
+      region,
+      cover,
+      rank,
+      prevRank,
+      prevIndexScore,
+      indexScore,
+      visaFree,
+      visaOnArrival,
+      eta,
+      visaRequired,
+      mobility,
+      history,
+    ]) => {
       const totalAccess = visaFree + visaOnArrival + eta;
-      const accessDelta = Math.round((prevRank - rank) * 1.6);
       return {
         iso,
         name,
@@ -299,16 +301,17 @@ export const PASSPORTS: Passport[] = (() => {
         rankDelta: prevRank - rank,
         regionalRank: 0,
         regionalTotal: 0,
+        indexScore,
+        prevIndexScore,
         visaFree,
         visaOnArrival,
         eta,
         visaRequired,
         totalAccess,
-        prevAccess: totalAccess - accessDelta,
-        accessDelta,
+        prevAccess: prevIndexScore,
+        accessDelta: indexScore - prevIndexScore,
         mobility,
         history,
-        history10: extendHistory(iso, history),
       } satisfies Passport;
     },
   );
