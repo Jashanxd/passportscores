@@ -120,6 +120,26 @@ export async function fetchRulesForNationality(
     }
   };
 
+  // Shape Z: visa-requirement /v2/visa/map -> { data: { colors: { green, yellow, blue, red } } }
+  const colours = (payload as { data?: { colors?: Record<string, string> } } | null)?.data?.colors;
+  if (colours && typeof colours === "object") {
+    const legend: Record<string, AccessKind> = {
+      green: "free",
+      yellow: "voa",
+      blue: "eta",
+      red: "required",
+    };
+    for (const [colour, kind] of Object.entries(legend)) {
+      const csv = colours[colour];
+      if (typeof csv !== "string") continue;
+      for (const iso of csv.split(",")) {
+        const code = iso.trim().toUpperCase();
+        if (code.length === 2 && knownIso.has(code) && code !== nationality.toUpperCase()) out[code] = kind;
+      }
+    }
+    if (Object.keys(out).length > 0) return out;
+  }
+
   if (Array.isArray(payload)) {
     walkList(payload as ProviderEntry[]);
   } else if (payload && typeof payload === "object") {
