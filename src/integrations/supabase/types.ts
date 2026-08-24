@@ -165,7 +165,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      recompute_passport_snapshot: {
+        Args: { _source?: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
