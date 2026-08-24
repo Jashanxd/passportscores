@@ -71,10 +71,10 @@ function ComparePage() {
 
   const baseLeft = useLivePassport(getPassport(a ?? "SG") ?? getPassport("SG")!);
   const baseRight = useLivePassport(getPassport(b ?? "IN") ?? getPassport("IN")!);
-  const leftCounts = useAccessLists(baseLeft).counts;
-  const rightCounts = useAccessLists(baseRight).counts;
-  const left = useMemo(() => ({ ...baseLeft, ...leftCounts }), [baseLeft, leftCounts]);
-  const right = useMemo(() => ({ ...baseRight, ...rightCounts }), [baseRight, rightCounts]);
+  // Compared metrics come from the published index; the divergence lists further
+  // down use the visa-rule feed.
+  const left = baseLeft;
+  const right = baseRight;
 
   const setSlot = (slot: "a" | "b", iso: string) =>
     navigate({ search: (prev) => ({ ...prev, [slot]: iso }) });
