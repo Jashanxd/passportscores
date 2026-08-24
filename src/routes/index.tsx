@@ -170,14 +170,28 @@ function Explorer() {
       <section className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-14 md:grid-cols-2">
           <Reveal>
-            <p className="eyebrow">Five-year trajectory</p>
-            <h2 className="mt-3 text-3xl">Rank movement since {DATA_YEAR - 4}</h2>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow">Rank trajectory</p>
+                <h2 className="mt-3 text-3xl">Rank movement since {DATA_YEAR - years + 1}</h2>
+              </div>
+              <select
+                value={years}
+                onChange={(e) => setYears(Number(e.target.value))}
+                aria-label="Trajectory period"
+                className="mt-1 rounded-full border border-border bg-transparent px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground focus:outline-none"
+              >
+                <option value={3}>3Y</option>
+                <option value={5}>5Y</option>
+                <option value={10}>10Y</option>
+              </select>
+            </div>
             <div className="mt-6">
-              <RankSparkline history={passport.history} />
+              <RankSparkline history={trajectory} />
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               {passport.name} sits at #{passport.rank} today, from #{passport.prevRank} a year ago.
-              A higher line means a stronger position.
+              Hover the line to read any year. A higher line means a stronger position.
             </p>
           </Reveal>
 
