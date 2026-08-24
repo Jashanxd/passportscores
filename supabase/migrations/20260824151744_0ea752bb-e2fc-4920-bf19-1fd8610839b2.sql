@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.recompute_passport_snapshot(text) FROM anon, authenticated;
