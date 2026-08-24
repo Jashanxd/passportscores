@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { DATA_YEAR } from "../data/passports";
 import { useDataStatus } from "../hooks/usePassportData";
+import psLogo from "../assets/ps-logo.png.asset.json";
 
 function NotFoundComponent() {
   return (
@@ -100,7 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
     ],
   }),
   shellComponent: RootShell,
@@ -134,8 +136,15 @@ function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link to="/" className="group flex items-baseline gap-2">
-          <span className="font-display text-xl tracking-tight">Passport Scores</span>
+        <Link to="/" className="group flex items-center gap-2.5">
+          <img
+            src={psLogo.url}
+            alt="Passport Scores"
+            width={28}
+            height={28}
+            className="h-7 w-7 shrink-0 rounded-full"
+          />
+          <span className="font-display text-xl leading-none tracking-tight">Passport Scores</span>
           <span className="hidden text-[10px] tracking-[0.2em] text-muted-foreground uppercase sm:inline">
             {DATA_YEAR}
           </span>
