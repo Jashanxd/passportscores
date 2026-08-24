@@ -71,8 +71,8 @@ function ComparePage() {
 
   const baseLeft = useLivePassport(getPassport(a ?? "SG") ?? getPassport("SG")!);
   const baseRight = useLivePassport(getPassport(b ?? "IN") ?? getPassport("IN")!);
-  // Compared metrics come from the published index; the divergence lists further
-  // down use the visa-rule feed.
+  // Ranks come from the published index; every destination count and the
+  // divergence lists come from the live visa-rule feed.
   const left = baseLeft;
   const right = baseRight;
 

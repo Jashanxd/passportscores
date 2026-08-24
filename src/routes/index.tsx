@@ -171,7 +171,7 @@ function Explorer() {
                 <p className="tnum font-display mt-2 text-6xl leading-none">
                   <AnimatedNumber value={passport.totalAccess} />
                 </p>
-                <DeltaBadge delta={passport.accessDelta} className="mt-3" suffix=" destinations" />
+                <DeltaBadge delta={passport.accessDelta} className="mt-3" suffix=" index score YoY" />
               </div>
             </div>
 
@@ -218,10 +218,11 @@ function Explorer() {
             <p className="eyebrow">Travel access</p>
             <h2 className="mt-3 text-4xl">Where a {passport.name} passport can go</h2>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Per-country rules come from the live visa-rule feed and cover the{" "}
-              {GLOBAL_STATS.countries} indexed countries, so these tallies run slightly below the
-              headline totals above, which count all {TOTAL_DESTINATIONS} destinations in the{" "}
-              {DATA_YEAR} index.
+              Access rules come from the live visa-rule feed, refreshed weekly, and cover the{" "}
+              {GLOBAL_STATS.countries} indexed countries — the same source as the counts above.
+              Global and regional ranks follow the published {DATA_YEAR} index, which scores all{" "}
+              {TOTAL_DESTINATIONS} destinations, so a higher-ranked passport can show a slightly
+              lower live tally.
             </p>
           </Reveal>
 
