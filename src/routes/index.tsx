@@ -58,19 +58,22 @@ const ACCESS_TABS: { key: AccessKind; dot: string }[] = [
 function Explorer() {
   const { country } = Route.useSearch();
   const navigate = useNavigate({ from: "/" });
-  const passport = useLivePassport(getPassport(country ?? "SG")!);
+  const base = useLivePassport(getPassport(country ?? "SG")!);
 
   const [tab, setTab] = useState<AccessKind>("free");
   const [region, setRegion] = useState<Region | "all">("all");
   const [years, setYears] = useState(5);
   const [query, setQuery] = useState("");
 
+  const { lists, estimated, counts } = useAccessLists(base);
+  // Numbers shown always match the destination lists rendered below.
+  const passport = useMemo(() => ({ ...base, ...counts }), [base, counts]);
+
   const trajectory = useMemo(
     () => passport.history10.slice(passport.history10.length - years),
     [passport, years],
   );
 
-  const { lists, estimated } = useAccessLists(passport);
   const destinations = useMemo(() => {
     const q = query.trim().toLowerCase();
     return lists[tab].filter(
@@ -79,6 +82,7 @@ function Explorer() {
         (q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q)),
     );
   }, [lists, tab, region, query]);
+
 
   return (
     <div>
