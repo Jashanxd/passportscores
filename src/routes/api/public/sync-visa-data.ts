@@ -94,22 +94,37 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
             );
           }
 
-          // 2. Pull the real matrix, nationality by nationality.
+          // 2. Pull the real matrix, prioritising nationalities we have never
+          //    fetched (providers meter requests, so each run tops up coverage).
           const knownIso = new Set(PASSPORTS.map((p) => p.iso));
-          const batch = PASSPORTS.slice(offset, offset + limit);
+          const { data: covered } = await supabaseAdmin
+            .from("visa_rules")
+            .select("nationality_iso")
+            .limit(60000);
+          const have = new Set((covered ?? []).map((r) => r.nationality_iso));
+          const ordered = [
+            ...PASSPORTS.filter((p) => !have.has(p.iso)),
+            ...PASSPORTS.filter((p) => have.has(p.iso)),
+          ];
+          const batch = ordered.slice(offset, offset + limit);
           let written = 0;
           const failures: string[] = [];
+          let quotaExhausted = false;
 
           const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
           const fetchWithRetry = async (iso: string) => {
             let lastErr: unknown;
-            for (let attempt = 0; attempt < 4; attempt++) {
+            for (let attempt = 0; attempt < 3; attempt++) {
               try {
                 const rules = await fetchRulesForNationality(config, iso, knownIso);
                 if (Object.keys(rules).length > 0) return rules;
                 lastErr = new Error("empty response");
               } catch (err) {
                 lastErr = err;
+                if (err instanceof Error && /\b429\b/.test(err.message)) {
+                  quotaExhausted = true;
+                  throw err;
+                }
               }
               await sleep(400 * (attempt + 1));
             }
@@ -117,6 +132,7 @@ export const Route = createFileRoute("/api/public/sync-visa-data")({
           };
 
           for (let i = 0; i < batch.length; i += 4) {
+            if (quotaExhausted) break;
             const chunk = batch.slice(i, i + 4);
             await Promise.all(
               chunk.map(async (p) => {
