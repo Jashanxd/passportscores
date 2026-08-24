@@ -11,8 +11,8 @@ import { RankSparkline } from "@/components/RankSparkline";
 import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { cn } from "@/lib/utils";
-import {
 import { Flag } from "@/components/Flag";
+import {
   ACCESS_LABELS,
   DATA_YEAR,
   GLOBAL_STATS,
