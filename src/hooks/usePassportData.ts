@@ -19,43 +19,21 @@ export function useLiveIndex() {
 }
 
 /**
- * Ranking figures (global rank, regional rank, YoY movement, published score)
- * always come from the 2026 index. Everything measured per destination —
- * visa-free / on-arrival / eTA / required counts and the mobility score — comes
- * from the live provider feed when it has been synced for that passport.
+ * Headline figures — global rank, regional rank, movement, published score and
+ * the visa-free / on-arrival / eTA / required split — all come from the
+ * published August 2026 index (227 destinations). The live provider feed is
+ * used only for the per-destination Travel Access lists and comparison
+ * divergence, since it covers just the countries indexed here.
  */
-function withLiveCounts(base: Passport, snap: LiveCounts | undefined): Passport {
-  if (!snap) return base;
-  const totalAccess = snap.visaFree + snap.visaOnArrival + snap.eta;
-  if (totalAccess === 0) return base;
-  return {
-    ...base,
-    visaFree: snap.visaFree,
-    visaOnArrival: snap.visaOnArrival,
-    eta: snap.eta,
-    visaRequired: snap.visaRequired,
-    totalAccess,
-    mobility: snap.mobility || base.mobility,
-  };
-}
-
-interface LiveCounts {
-  visaFree: number;
-  visaOnArrival: number;
-  eta: number;
-  visaRequired: number;
-  mobility: number;
-}
-
 export function useLivePassport(base: Passport): Passport {
-  const live = useLiveIndex();
-  return useMemo(() => withLiveCounts(base, live.get(base.iso)), [base, live]);
+  useLiveIndex();
+  return base;
 }
 
-/** The published 2026 ranking, with live per-destination counts merged in. */
+/** The published 2026 ranking. */
 export function useLivePassports(): Passport[] {
-  const live = useLiveIndex();
-  return useMemo(() => PASSPORTS.map((p) => withLiveCounts(p, live.get(p.iso))), [live]);
+  useLiveIndex();
+  return PASSPORTS;
 }
 
 export interface AccessLists {
