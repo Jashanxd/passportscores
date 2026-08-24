@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search, X } from "lucide-react";
 import { Reveal } from "@/components/Reveal";
 import { PassportCover } from "@/components/PassportCover";
 import { CountrySearch } from "@/components/CountrySearch";
