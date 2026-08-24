@@ -78,7 +78,7 @@ function AboutPage() {
             more useful number: it tells you how a passport compares with its neighbours. Rank
             trajectory uses the real published standings for 2024, 2025 and 2026. The headline
             visa-free, visa-on-arrival, eTA and visa-required counts are the published index figures;
-            the individual country lists come from the live visa-rule feed, refreshed weekly, which
+            the individual country lists come from the live visa-rule feed, refreshed monthly, which
             covers the indexed countries only.
 
           </p>
