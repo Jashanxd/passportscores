@@ -259,6 +259,28 @@ function Explorer() {
             ))}
           </div>
 
+          <div className="relative mt-6 max-w-sm">
+            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search destinations…"
+              aria-label="Search destinations"
+              className="w-full rounded-full border border-border bg-transparent py-2 pr-9 pl-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </button>
+            )}
+          </div>
+
+
+
           <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
             {destinations.map((d) => (
               <li key={d.iso} className="border-b border-border/60 py-2">
