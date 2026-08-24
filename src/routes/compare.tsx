@@ -1,3 +1,5 @@
+import { useMemo, useState } from "react";
+import { Search, X } from "lucide-react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { Reveal } from "@/components/Reveal";
