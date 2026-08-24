@@ -227,6 +227,12 @@ function Explorer() {
           <Reveal>
             <p className="eyebrow">Travel access</p>
             <h2 className="mt-3 text-4xl">Where a {passport.name} passport can go</h2>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              Per-country rules come from the live visa-rule feed and cover the{" "}
+              {GLOBAL_STATS.countries} indexed countries, so these tallies run slightly below the
+              headline totals above, which count all {TOTAL_DESTINATIONS} destinations in the{" "}
+              {DATA_YEAR} index.
+            </p>
           </Reveal>
 
           <div className="mt-10 flex flex-wrap gap-2">
