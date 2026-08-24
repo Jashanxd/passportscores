@@ -43,6 +43,34 @@ export function useLivePassport(base: Passport): Passport {
   }, [base, live]);
 }
 
+/** The whole index, with live snapshot values merged in where available. */
+export function useLivePassports(): Passport[] {
+  const index = useLiveIndex();
+  return useMemo(() => {
+    if (index.size === 0) return PASSPORTS;
+    const merged = PASSPORTS.map((base) => {
+      const live = index.get(base.iso);
+      if (!live) return base;
+      const totalAccess = live.visaFree + live.visaOnArrival + live.eta;
+      const prevRank = live.prevRank ?? base.prevRank;
+      return {
+        ...base,
+        rank: live.rank,
+        prevRank,
+        rankDelta: prevRank - live.rank,
+        regionalRank: live.regionalRank || base.regionalRank,
+        visaFree: live.visaFree,
+        visaOnArrival: live.visaOnArrival,
+        eta: live.eta,
+        visaRequired: live.visaRequired,
+        totalAccess,
+        mobility: live.mobility || base.mobility,
+      };
+    });
+    return merged.sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
+  }, [index]);
+}
+
 export interface AccessLists {
   free: Passport[];
   voa: Passport[];
