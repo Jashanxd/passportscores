@@ -6,8 +6,9 @@ import { Reveal } from "@/components/Reveal";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { PassportCover } from "@/components/PassportCover";
 import { cn } from "@/lib/utils";
-import { DATA_YEAR, PASSPORTS, REGIONS, REGION_LABELS, type Region } from "@/data/passports";
+import { DATA_YEAR, REGIONS, REGION_LABELS, type Passport, type Region } from "@/data/passports";
 import { Flag } from "@/components/Flag";
+import { useLivePassports } from "@/hooks/usePassportData";
 
 export const Route = createFileRoute("/rankings")({
   head: () => ({
