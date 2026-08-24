@@ -358,32 +358,49 @@ export const ACCESS_LABELS: Record<AccessKind, string> = {
 };
 
 /**
- * Deterministic per-destination access map. Access is assigned in a stable
- * order so that overlap between any two passports stays consistent.
+ * Deterministic per-destination access map. Bucket sizes are scaled from the
+ * passport's counts (measured against TOTAL_DESTINATIONS) down to the number of
+ * countries actually listable here, so list lengths always match the numbers
+ * shown in the stats and the access bar. Assignment order is stable per ISO so
+ * overlap between any two passports stays consistent.
  */
 export function accessListFor(p: Passport) {
+  const dests = PASSPORTS.filter((d) => d.iso !== p.iso);
+  const n = dests.length;
   const seedShift = [...p.iso].reduce((s, c) => s + c.charCodeAt(0), 0) % 17;
-  const free: Passport[] = [];
-  const voa: Passport[] = [];
-  const etaList: Passport[] = [];
-  const required: Passport[] = [];
-  PASSPORTS.forEach((dest, i) => {
-    if (dest.iso === p.iso) return;
-    const slot = ((i * i * 7 + i * (seedShift + 3) + seedShift * 29) % PASSPORTS.length) / PASSPORTS.length;
-    const scaled = slot * TOTAL_DESTINATIONS;
-    if (scaled < p.visaFree) free.push(dest);
-    else if (scaled < p.visaFree + p.visaOnArrival) voa.push(dest);
-    else if (scaled < p.totalAccess) etaList.push(dest);
-    else required.push(dest);
-  });
+
+  // Stable pseudo-random ordering of destinations for this passport.
+  const ordered = dests
+    .map((dest, i) => ({
+      dest,
+      key: (i * i * 7 + i * (seedShift + 3) + seedShift * 29) % PASSPORTS.length,
+    }))
+    .sort((a, b) => a.key - b.key || a.dest.iso.localeCompare(b.dest.iso))
+    .map((x) => x.dest);
+
+  // Largest-remainder rounding so the four bucket sizes sum to exactly n.
+  const raw = [p.visaFree, p.visaOnArrival, p.eta, p.visaRequired].map(
+    (v) => (v / TOTAL_DESTINATIONS) * n,
+  );
+  const sizes = raw.map((v) => Math.floor(v));
+  let left = n - sizes.reduce((s, v) => s + v, 0);
+  const order = raw
+    .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+    .sort((a, b) => b.frac - a.frac);
+  for (let k = 0; left > 0; k++, left--) sizes[order[k % 4]!.i]! += 1;
+
   const byName = (a: Passport, b: Passport) => a.name.localeCompare(b.name);
+  let cursor = 0;
+  const take = (count: number) => ordered.slice(cursor, (cursor += count)).sort(byName);
+
   return {
-    free: free.sort(byName),
-    voa: voa.sort(byName),
-    eta: etaList.sort(byName),
-    required: required.sort(byName),
+    free: take(sizes[0]!),
+    voa: take(sizes[1]!),
+    eta: take(sizes[2]!),
+    required: take(sizes[3]!),
   };
 }
+
 
 export function accessKindFor(p: Passport, destIso: string): AccessKind {
   const lists = accessListFor(p);
