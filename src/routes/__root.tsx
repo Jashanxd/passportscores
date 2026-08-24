@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { DATA_YEAR } from "../data/passports";
+import { useDataStatus } from "../hooks/usePassportData";
 
 function NotFoundComponent() {
   return (
@@ -160,9 +161,21 @@ function SiteFooter() {
         <p>
           Passport Index — a {DATA_YEAR} study of global mobility across 227 destinations.
         </p>
-        <p>Indicative data for editorial use. Always confirm requirements with the embassy.</p>
+        <DataFreshness />
       </div>
     </footer>
+  );
+}
+
+function DataFreshness() {
+  const status = useDataStatus();
+  const updated = status?.updatedAt ? new Date(status.updatedAt) : null;
+  return (
+    <p>
+      {updated
+        ? `Data updated ${updated.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} · source ${status?.source}. Refreshes weekly.`
+        : "Indicative data for editorial use. Always confirm requirements with the embassy."}
+    </p>
   );
 }
 

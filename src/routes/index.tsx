@@ -20,11 +20,12 @@ import {
   REGIONS,
   REGION_LABELS,
   TOTAL_DESTINATIONS,
-  accessListFor,
   getPassport,
   type AccessKind,
+  type Passport,
   type Region,
 } from "@/data/passports";
+import { useAccessLists, useLivePassport } from "@/hooks/usePassportData";
 
 export const Route = createFileRoute("/")({
   validateSearch: z.object({ country: z.string().optional() }),
@@ -57,7 +58,7 @@ const ACCESS_TABS: { key: AccessKind; dot: string }[] = [
 function Explorer() {
   const { country } = Route.useSearch();
   const navigate = useNavigate({ from: "/" });
-  const passport = getPassport(country ?? "SG")!;
+  const passport = useLivePassport(getPassport(country ?? "SG")!);
 
   const [tab, setTab] = useState<AccessKind>("free");
   const [region, setRegion] = useState<Region | "all">("all");
@@ -69,11 +70,11 @@ function Explorer() {
     [passport, years],
   );
 
-  const lists = useMemo(() => accessListFor(passport), [passport]);
+  const { lists, estimated } = useAccessLists(passport);
   const destinations = useMemo(() => {
     const q = query.trim().toLowerCase();
     return lists[tab].filter(
-      (d) =>
+      (d: Passport) =>
         (region === "all" || d.region === region) &&
         (q === "" || d.name.toLowerCase().includes(q) || d.iso.toLowerCase().includes(q)),
     );
@@ -280,9 +281,15 @@ function Explorer() {
           </div>
 
 
+          {estimated && (
+            <p className="mt-5 text-xs text-muted-foreground">
+              Estimated distribution — live per-country rules appear here once the visa data provider
+              is connected.
+            </p>
+          )}
 
           <ul className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
-            {destinations.map((d) => (
+            {destinations.map((d: Passport) => (
               <li key={d.iso} className="border-b border-border/60 py-2">
                 <button
                   onClick={() => navigate({ search: { country: d.iso } })}

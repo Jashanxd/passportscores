@@ -6,8 +6,9 @@ import { Reveal } from "@/components/Reveal";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { PassportCover } from "@/components/PassportCover";
 import { cn } from "@/lib/utils";
-import { DATA_YEAR, PASSPORTS, REGIONS, REGION_LABELS, type Region } from "@/data/passports";
+import { DATA_YEAR, REGIONS, REGION_LABELS, type Passport, type Region } from "@/data/passports";
 import { Flag } from "@/components/Flag";
+import { useLivePassports } from "@/hooks/usePassportData";
 
 export const Route = createFileRoute("/rankings")({
   head: () => ({
@@ -35,9 +36,11 @@ function RankingsPage() {
   const [region, setRegion] = useState<Region | "all">("all");
   const [sort, setSort] = useState<SortKey>("rank");
 
+  const passports = useLivePassports();
+
   const rows = useMemo(() => {
-    const filtered = PASSPORTS.filter(
-      (p) =>
+    const filtered = passports.filter(
+      (p: Passport) =>
         (region === "all" || p.region === region) &&
         p.name.toLowerCase().includes(query.trim().toLowerCase()),
     );
@@ -46,9 +49,9 @@ function RankingsPage() {
     else if (sort === "change") sorted.sort((a, b) => b.rankDelta - a.rankDelta);
     else sorted.sort((a, b) => a.rank - b.rank);
     return sorted;
-  }, [query, region, sort]);
+  }, [passports, query, region, sort]);
 
-  const top = PASSPORTS.slice(0, 5);
+  const top = passports.slice(0, 5);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
@@ -61,7 +64,7 @@ function RankingsPage() {
 
       <Reveal delay={80} className="mt-14">
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-5">
-          {top.map((p, i) => (
+          {top.map((p: Passport, i: number) => (
             <Link
               key={p.iso}
               to="/"
