@@ -18,7 +18,7 @@ export interface ProviderConfig {
   url: string;
   key: string;
   keyHeader: string;
-  host?: string;
+  host?: string | undefined;
   source: string;
 }
 
