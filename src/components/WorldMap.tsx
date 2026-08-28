@@ -162,12 +162,12 @@ export function WorldMap({
             aria-label="World map — select a country to see its passport score"
           >
             <g transform={`translate(${offset.x} ${offset.y}) scale(${zoom})`}>
-              {shapes.map((s) => {
+              {shapes.map((s, i) => {
                 const isSelected = !!s.iso && s.iso === selectedIso;
                 const isHovered = tooltip?.name === s.name;
                 return (
                   <path
-                    key={s.id}
+                    key={`${s.id}-${i}`}
                     d={s.d}
                     vectorEffect="non-scaling-stroke"
                     className={cn(
