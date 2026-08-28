@@ -130,6 +130,26 @@ function Explorer() {
         </Reveal>
       </section>
 
+      {/* World map picker */}
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Pick from the map</p>
+              <h2 className="mt-3 text-3xl">Choose a country anywhere in the world</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Currently showing {passport.name}
+            </p>
+          </div>
+          <WorldMap
+            className="mt-8"
+            selectedIso={passport.iso}
+            onSelect={(iso) => navigate({ search: { country: iso } })}
+          />
+        </Reveal>
+      </section>
+
       {/* Passport panel */}
       <section className="border-y border-border bg-card/60">
         <div className="mx-auto grid max-w-6xl gap-14 px-6 py-16 lg:grid-cols-[auto_1fr] lg:items-start">
