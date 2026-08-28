@@ -18,6 +18,14 @@ function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
 }
 
+/** Keep the map from being dragged off screen. */
+function clampOffset(o: { x: number; y: number }, z: number) {
+  return {
+    x: clamp(o.x, WIDTH * (1 - z), 0),
+    y: clamp(o.y, HEIGHT * (1 - z), 0),
+  };
+}
+
 export function WorldMap({
   selectedIso,
   onSelect,
@@ -80,7 +88,7 @@ export function WorldMap({
     const next = clamp(z * factor, MIN_ZOOM, MAX_ZOOM);
     const k = next / z;
     setZoom(next);
-    setOffset({ x: px - (px - o.x) * k, y: py - (py - o.y) * k });
+    setOffset(clampOffset({ x: px - (px - o.x) * k, y: py - (py - o.y) * k }, next));
   }, []);
 
   const zoomAtRef = useRef(zoomAt);
@@ -122,7 +130,7 @@ export function WorldMap({
       if (Math.abs(dx) > 2 || Math.abs(dy) > 2) drag.current.moved = true;
       drag.current.x = e.clientX;
       drag.current.y = e.clientY;
-      setOffset((o) => ({ x: o.x + dx, y: o.y + dy }));
+      setOffset((o) => clampOffset({ x: o.x + dx, y: o.y + dy }, stateRef.current.zoom));
     }
     setHover((h) => (h ? { ...h, x: e.clientX - rect.left, y: e.clientY - rect.top } : h));
   };
