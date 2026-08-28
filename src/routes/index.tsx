@@ -12,6 +12,7 @@ import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { cn } from "@/lib/utils";
 import { Flag } from "@/components/Flag";
+import { WorldMap } from "@/components/WorldMap";
 import {
   ACCESS_LABELS,
   DATA_YEAR,
