@@ -12,6 +12,7 @@ import { AnimatedNumber } from "@/components/AnimatedNumber";
 import { DeltaBadge } from "@/components/DeltaBadge";
 import { cn } from "@/lib/utils";
 import { Flag } from "@/components/Flag";
+import { WorldMap } from "@/components/WorldMap";
 import {
   ACCESS_LABELS,
   DATA_YEAR,
@@ -127,6 +128,26 @@ function Explorer() {
               <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
             </div>
           ))}
+        </Reveal>
+      </section>
+
+      {/* World map picker */}
+      <section className="mx-auto max-w-6xl px-6 pb-16">
+        <Reveal>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow">Pick from the map</p>
+              <h2 className="mt-3 text-3xl">Choose a country anywhere in the world</h2>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Currently showing {passport.name}
+            </p>
+          </div>
+          <WorldMap
+            className="mt-8"
+            selectedIso={passport.iso}
+            onSelect={(iso) => navigate({ search: { country: iso } })}
+          />
         </Reveal>
       </section>
 
