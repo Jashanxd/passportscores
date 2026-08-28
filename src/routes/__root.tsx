@@ -158,6 +158,7 @@ function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <ThemeToggle />
         </nav>
       </div>
     </header>
