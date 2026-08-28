@@ -130,7 +130,7 @@ export function WorldMap({
       if (Math.abs(dx) > 2 || Math.abs(dy) > 2) drag.current.moved = true;
       drag.current.x = e.clientX;
       drag.current.y = e.clientY;
-      setOffset((o) => ({ x: o.x + dx, y: o.y + dy }));
+      setOffset((o) => clampOffset({ x: o.x + dx, y: o.y + dy }, stateRef.current.zoom));
     }
     setHover((h) => (h ? { ...h, x: e.clientX - rect.left, y: e.clientY - rect.top } : h));
   };
