@@ -113,6 +113,7 @@ export function WorldMap({
   }, []);
 
   const drag = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  const pendingIso = useRef<string | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
     drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
@@ -139,9 +140,9 @@ export function WorldMap({
     if (drag.current?.id === e.pointerId) {
       const moved = drag.current.moved;
       drag.current = null;
-      return moved;
+      if (!moved && pendingIso.current) onSelect(pendingIso.current);
     }
-    return false;
+    pendingIso.current = null;
   };
 
   const reset = () => {
@@ -199,9 +200,8 @@ export function WorldMap({
                         y: rect ? e.clientY - rect.top : 0,
                       });
                     }}
-                    onPointerUp={() => {
-                      if (drag.current?.moved) return;
-                      if (s.iso) onSelect(s.iso);
+                    onPointerDown={() => {
+                      pendingIso.current = s.iso;
                     }}
                   />
                 );
