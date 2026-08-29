@@ -140,9 +140,9 @@ export function WorldMap({
     if (drag.current?.id === e.pointerId) {
       const moved = drag.current.moved;
       drag.current = null;
-      return moved;
+      if (!moved && pendingIso.current) onSelect(pendingIso.current);
     }
-    return false;
+    pendingIso.current = null;
   };
 
   const reset = () => {
