@@ -199,7 +199,7 @@ export function WorldMap({
                         y: rect ? e.clientY - rect.top : 0,
                       });
                     }}
-                    onClick={() => {
+                    onPointerUp={() => {
                       if (drag.current?.moved) return;
                       if (s.iso) onSelect(s.iso);
                     }}
