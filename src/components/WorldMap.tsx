@@ -113,6 +113,7 @@ export function WorldMap({
   }, []);
 
   const drag = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  const pendingIso = useRef<string | null>(null);
 
   const onPointerDown = (e: React.PointerEvent) => {
     drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
