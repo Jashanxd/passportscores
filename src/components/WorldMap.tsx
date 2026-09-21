@@ -299,7 +299,8 @@ export function WorldMap({
         </div>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Scroll or pinch to zoom, drag to pan, click a country to load its passport.
+        Scroll or pinch to zoom, drag to pan, click a country to load its passport. Dots mark
+        small states such as Singapore, Malta and Maldives.
       </p>
     </div>
   );
