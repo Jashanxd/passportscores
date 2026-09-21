@@ -5,14 +5,21 @@ import { Minus, Plus, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NUMERIC_TO_ISO2 } from "@/data/isoNumeric";
 import { getPassport } from "@/data/passports";
+import { EXTRA_MARKERS, MAP_NAME_OVERRIDES } from "@/data/mapNames";
 
-const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+// 50m detail includes the small states (Singapore, Malta, Bahrain, Maldives…)
+// that the 110m basemap drops; 110m stays as a fallback.
+const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
+const TOPO_FALLBACK_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const WIDTH = 900;
 const HEIGHT = 460;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 12;
+/** Projected area (px²) below which a country also gets a clickable marker. */
+const TINY_AREA = 12;
 
 type Shape = { id: string; iso: string | null; name: string; d: string };
+type Marker = { iso: string; name: string; x: number; y: number };
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
@@ -36,6 +43,7 @@ export function WorldMap({
   className?: string;
 }) {
   const [shapes, setShapes] = useState<Shape[] | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
   const [failed, setFailed] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -49,8 +57,9 @@ export function WorldMap({
 
   useEffect(() => {
     let alive = true;
-    fetch(TOPO_URL)
-      .then((r) => r.json())
+    const load = (url: string) => fetch(url).then((r) => r.json());
+    load(TOPO_URL)
+      .catch(() => load(TOPO_FALLBACK_URL))
       .then((topo: any) => {
         if (!alive) return;
         const geo: any = feature(topo, topo.objects.countries);
@@ -62,20 +71,41 @@ export function WorldMap({
           geo,
         );
         const path = geoPath(projection);
-        const next: Shape[] = geo.features
-          .map((f: any) => {
-            const d = path(f);
-            if (!d) return null;
-            const iso = NUMERIC_TO_ISO2[String(Number(f.id))] ?? null;
-            return {
-              id: String(f.id),
-              iso: iso && getPassport(iso) ? iso : null,
-              name: f.properties?.name ?? "Unknown",
-              d,
-            } satisfies Shape;
-          })
-          .filter(Boolean);
-        setShapes(next);
+        const nextShapes: Shape[] = [];
+        const nextMarkers: Marker[] = [];
+        const seen = new Set<string>();
+
+        for (const f of geo.features as any[]) {
+          const d = path(f);
+          if (!d) continue;
+          const rawIso = NUMERIC_TO_ISO2[String(Number(f.id))] ?? null;
+          const entry = rawIso ? getPassport(rawIso) : undefined;
+          const iso = entry ? rawIso : null;
+          const rawName = f.properties?.name ?? "Unknown";
+          const name = entry?.name ?? MAP_NAME_OVERRIDES[rawName] ?? rawName;
+          nextShapes.push({ id: String(f.id), iso, name, d } satisfies Shape);
+
+          if (iso && entry) {
+            seen.add(iso);
+            // Micro-states are a couple of pixels wide — give them a marker too.
+            if (path.area(f) < TINY_AREA) {
+              const [cx, cy] = path.centroid(f);
+              if (Number.isFinite(cx) && Number.isFinite(cy)) {
+                nextMarkers.push({ iso, name, x: cx, y: cy });
+              }
+            }
+          }
+        }
+
+        for (const [iso, coords] of Object.entries(EXTRA_MARKERS)) {
+          const entry = getPassport(iso);
+          if (!entry || seen.has(iso)) continue;
+          const p = projection(coords);
+          if (p) nextMarkers.push({ iso, name: entry.name, x: p[0], y: p[1] });
+        }
+
+        setShapes(nextShapes);
+        setMarkers(nextMarkers);
       })
       .catch(() => alive && setFailed(true));
     return () => {
@@ -206,6 +236,38 @@ export function WorldMap({
                   />
                 );
               })}
+
+              {markers.map((m) => {
+                const isSelected = m.iso === selectedIso;
+                return (
+                  <circle
+                    key={`marker-${m.iso}`}
+                    cx={m.x}
+                    cy={m.y}
+                    r={3.2 / zoom}
+                    vectorEffect="non-scaling-stroke"
+                    className={cn(
+                      "cursor-pointer stroke-background transition-colors duration-150",
+                      isSelected || tooltip?.name === m.name
+                        ? "fill-primary"
+                        : "fill-primary/70",
+                    )}
+                    strokeWidth={0.8}
+                    onPointerEnter={(e) => {
+                      const rect = containerRef.current?.getBoundingClientRect();
+                      setHover({
+                        name: m.name,
+                        iso: m.iso,
+                        x: rect ? e.clientX - rect.left : 0,
+                        y: rect ? e.clientY - rect.top : 0,
+                      });
+                    }}
+                    onPointerDown={() => {
+                      pendingIso.current = m.iso;
+                    }}
+                  />
+                );
+              })}
             </g>
           </svg>
         ) : (
@@ -237,7 +299,8 @@ export function WorldMap({
         </div>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Scroll or pinch to zoom, drag to pan, click a country to load its passport.
+        Scroll or pinch to zoom, drag to pan, click a country to load its passport. Dots mark
+        small states such as Singapore, Malta and Maldives.
       </p>
     </div>
   );
