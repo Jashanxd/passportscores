@@ -57,8 +57,9 @@ export function WorldMap({
 
   useEffect(() => {
     let alive = true;
-    fetch(TOPO_URL)
-      .then((r) => r.json())
+    const load = (url: string) => fetch(url).then((r) => r.json());
+    load(TOPO_URL)
+      .catch(() => load(TOPO_FALLBACK_URL))
       .then((topo: any) => {
         if (!alive) return;
         const geo: any = feature(topo, topo.objects.countries);
@@ -70,20 +71,41 @@ export function WorldMap({
           geo,
         );
         const path = geoPath(projection);
-        const next: Shape[] = geo.features
-          .map((f: any) => {
-            const d = path(f);
-            if (!d) return null;
-            const iso = NUMERIC_TO_ISO2[String(Number(f.id))] ?? null;
-            return {
-              id: String(f.id),
-              iso: iso && getPassport(iso) ? iso : null,
-              name: f.properties?.name ?? "Unknown",
-              d,
-            } satisfies Shape;
-          })
-          .filter(Boolean);
-        setShapes(next);
+        const nextShapes: Shape[] = [];
+        const nextMarkers: Marker[] = [];
+        const seen = new Set<string>();
+
+        for (const f of geo.features as any[]) {
+          const d = path(f);
+          if (!d) continue;
+          const rawIso = NUMERIC_TO_ISO2[String(Number(f.id))] ?? null;
+          const entry = rawIso ? getPassport(rawIso) : undefined;
+          const iso = entry ? rawIso : null;
+          const rawName = f.properties?.name ?? "Unknown";
+          const name = entry?.name ?? MAP_NAME_OVERRIDES[rawName] ?? rawName;
+          nextShapes.push({ id: String(f.id), iso, name, d } satisfies Shape);
+
+          if (iso && entry) {
+            seen.add(iso);
+            // Micro-states are a couple of pixels wide — give them a marker too.
+            if (path.area(f) < TINY_AREA) {
+              const [cx, cy] = path.centroid(f);
+              if (Number.isFinite(cx) && Number.isFinite(cy)) {
+                nextMarkers.push({ iso, name, x: cx, y: cy });
+              }
+            }
+          }
+        }
+
+        for (const [iso, coords] of Object.entries(EXTRA_MARKERS)) {
+          const entry = getPassport(iso);
+          if (!entry || seen.has(iso)) continue;
+          const p = projection(coords);
+          if (p) nextMarkers.push({ iso, name: entry.name, x: p[0], y: p[1] });
+        }
+
+        setShapes(nextShapes);
+        setMarkers(nextMarkers);
       })
       .catch(() => alive && setFailed(true));
     return () => {
