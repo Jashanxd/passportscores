@@ -236,6 +236,38 @@ export function WorldMap({
                   />
                 );
               })}
+
+              {markers.map((m) => {
+                const isSelected = m.iso === selectedIso;
+                return (
+                  <circle
+                    key={`marker-${m.iso}`}
+                    cx={m.x}
+                    cy={m.y}
+                    r={3.2 / zoom}
+                    vectorEffect="non-scaling-stroke"
+                    className={cn(
+                      "cursor-pointer stroke-background transition-colors duration-150",
+                      isSelected || tooltip?.name === m.name
+                        ? "fill-primary"
+                        : "fill-primary/70",
+                    )}
+                    strokeWidth={0.8}
+                    onPointerEnter={(e) => {
+                      const rect = containerRef.current?.getBoundingClientRect();
+                      setHover({
+                        name: m.name,
+                        iso: m.iso,
+                        x: rect ? e.clientX - rect.left : 0,
+                        y: rect ? e.clientY - rect.top : 0,
+                      });
+                    }}
+                    onPointerDown={() => {
+                      pendingIso.current = m.iso;
+                    }}
+                  />
+                );
+              })}
             </g>
           </svg>
         ) : (
