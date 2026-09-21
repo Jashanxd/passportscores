@@ -43,6 +43,7 @@ export function WorldMap({
   className?: string;
 }) {
   const [shapes, setShapes] = useState<Shape[] | null>(null);
+  const [markers, setMarkers] = useState<Marker[]>([]);
   const [failed, setFailed] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
