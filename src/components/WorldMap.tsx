@@ -5,14 +5,21 @@ import { Minus, Plus, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NUMERIC_TO_ISO2 } from "@/data/isoNumeric";
 import { getPassport } from "@/data/passports";
+import { EXTRA_MARKERS, MAP_NAME_OVERRIDES } from "@/data/mapNames";
 
-const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+// 50m detail includes the small states (Singapore, Malta, Bahrain, Maldives…)
+// that the 110m basemap drops; 110m stays as a fallback.
+const TOPO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
+const TOPO_FALLBACK_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 const WIDTH = 900;
 const HEIGHT = 460;
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 12;
+/** Projected area (px²) below which a country also gets a clickable marker. */
+const TINY_AREA = 12;
 
 type Shape = { id: string; iso: string | null; name: string; d: string };
+type Marker = { iso: string; name: string; x: number; y: number };
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
