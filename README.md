@@ -1,6 +1,6 @@
 # Passport Scores
 
-Build a sleek, premium website for comparing passports and global travel freedom.
+Built a sleek, premium website for comparing passports and global travel freedom.
 The main goal is to help users understand how powerful a passport is, using factors such as:
 Visa-free / visa-on-arrival access
 Number of destinations accessible
@@ -15,13 +15,3 @@ Keep the design minimal, modern, editorial, and travel-focused, with passport co
 
 **Live app**: https://passportscores.com
 
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
